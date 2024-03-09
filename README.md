@@ -1,12 +1,13 @@
 # Collabify
+<p align="center">
+  <img src="Frontend\Readme_files\logo.jpeg" width=200px>
+</p>
+
+
+# Project Overview
 1. [Project Report & API Docs](https://docs.google.com/document/d/1qe-v97qh0Op3Mk3ixpWzRCELSHMURxqcJao1n8w-aEI/edit)
 2. [Project Slides]()
 3. [Project Video]()
-
-# Project Overview
-<p align="center">
-  <img src="Readme_files\Collabify_logo.png" width=200px>
-</p>
 
 # Contributors
 
