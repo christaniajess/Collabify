@@ -14,7 +14,7 @@
 **G2 Team 1**
 <table>
     <tr>
-        <td align="center"><img src="Frontend\Readme_files\jesslyn.jpg" width="150px"/><br /><sub><b>Jesslyn Hilda Christania</b></sub></a></td>
+        <td align="center"><img src="Frontend\Readme_files\jesslyn.JPG" width="150px"/><br /><sub><b>Jesslyn Hilda Christania</b></sub></a></td>
         <td align="center"><img src="Frontend\Readme_files\justin.jpg" width="150px"/><br /><sub><b>Justin Arnold Sasam Rezaba</b></sub></a></td>
         <td align="center"><img src="Frontend\Readme_files\micole.jpg" width="150px"/><br /><sub><b>Micole John Evangelio Dela Cruz</b></sub></a></td>
         <td align="center"><img src="Frontend\Readme_files\izz.jpg" width="150px"/><br /><sub><b>Izz Danial Bin Sharudin</b></sub></a></td>
