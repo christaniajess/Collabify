@@ -9,9 +9,16 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-# Get All information about the user 
+
+#1. Invoke the Valudation Management service to get all the user information and check whether the user already has an existing project with that
+#name before. 
+
+
+#2. send the message 
 
 
 
 
-# get all unique class objects details for a specific user
+#3. if successful, invoke the project post service posting the new created project in the database  
+#4. send the message 
+#5. If not succesful, send an error message with a form asking the user to enter the form again
