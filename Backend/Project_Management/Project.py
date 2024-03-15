@@ -33,7 +33,7 @@ def json(self):
     'proj_description': self.proj_description
 
 
-#1. Invoke the Valudation Management service to get all the user information and check whether the user already has an existing project with that
+#1. Invoke the Validation Management service to get all the user information and check whether the user already has an existing project with that
 #name before. 
 
 
