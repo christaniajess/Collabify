@@ -29,46 +29,6 @@ class Project(db.Model):
             "proj_image": self.proj_image, "proj_description": self.proj_description
         }
 
-# @app.route('/get_all_projects', methods=['GET'])
-# def get_all_projects():
-#     try:
-#         projects = Project.query.all()
-#         project_list = []
-#         for project in projects:
-#             project_data = {
-#                 'proj_id': project.proj_id,
-#                 'user_id': project.user_id,
-#                 'proj_name': project.proj_name,
-#                 'proj_image': project.proj_image,
-#                 'proj_description': project.proj_description
-#             }
-#             project_list.append(project_data)
-        
-#         if len(project_list):
-#             return jsonify(
-#                 {
-#                     'code':200,
-#                     'data': project_list
-#                 }
-#             )
-
-#         return jsonify(
-#             {
-#                 'code':404,
-#                 'message': 'There are no projects yet'
-#             }
-#         )
-
-    
-#     except Exception as e:  # Catch all exceptions
-#         traceback.print_exc()  # Print traceback to console just to see what's wrong 
-#         return jsonify(
-#             {
-#                 'code':500,
-#                 'message': 'An error occurred while retrieving projects.'
-#             }
-#         ), 500
-
 #creating a new project (this is after the have passed validation as this microservice is only invoked after it has passed validation)
 @app.route('/create_project/<string:user_id>', methods=['POST'])
 def create_project(user_id):
@@ -165,6 +125,47 @@ def delete_project(user_id, proj_name):
             'code': 500,
             'message': 'An error occurred while deleting the project.'
         }), 500
+
+
+# @app.route('/get_all_projects', methods=['GET'])
+# def get_all_projects():
+#     try:
+#         projects = Project.query.all()
+#         project_list = []
+#         for project in projects:
+#             project_data = {
+#                 'proj_id': project.proj_id,
+#                 'user_id': project.user_id,
+#                 'proj_name': project.proj_name,
+#                 'proj_image': project.proj_image,
+#                 'proj_description': project.proj_description
+#             }
+#             project_list.append(project_data)
+        
+#         if len(project_list):
+#             return jsonify(
+#                 {
+#                     'code':200,
+#                     'data': project_list
+#                 }
+#             )
+
+#         return jsonify(
+#             {
+#                 'code':404,
+#                 'message': 'There are no projects yet'
+#             }
+#         )
+
+    
+#     except Exception as e:  # Catch all exceptions
+#         traceback.print_exc()  # Print traceback to console just to see what's wrong 
+#         return jsonify(
+#             {
+#                 'code':500,
+#                 'message': 'An error occurred while retrieving projects.'
+#             }
+#         ), 500
 
   
 if __name__ == '__main__':
