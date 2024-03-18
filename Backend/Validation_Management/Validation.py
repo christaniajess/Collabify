@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import environ
 
 app = Flask(__name__)
+portNumber = 5003
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('dbURL')
 #'mysql+mysqlconnector://root:root@localhost:3306/Projects'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
@@ -91,4 +92,4 @@ def validation(user_id, proj_name):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=portNumber, debug=True)
