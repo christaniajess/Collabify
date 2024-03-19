@@ -144,13 +144,14 @@ def create_collaboration():
         ), 500
 
 # Update Collaboration Status
-@app.route("/collaboration/cc/<int:cc_id>", methods=["PUT"])
-def update_collaboration_status(cc_id):
+@app.route("/collaboration/status", methods=["PUT"])
+def update_collaboration_status():
+    data=request.get_json()
     collabs = db.session.scalars(
-        db.select(collaboration).filter_by(cc_id=cc_id).limit(1)).first()
+        db.select(collaboration).filter_by(cc_id=data["cc_id"],brand_id=data["brand_id"])).first()
     if collabs:
         try:
-            collabs.collab_status = request.json["collab_status"]
+            collabs.collab_status = data["collab_status"]
             db.session.commit()
             return jsonify(
                 {
@@ -171,7 +172,7 @@ def update_collaboration_status(cc_id):
             {
                 "code": 404,
                 "data": {
-                    "cc_id": cc_id
+                    "cc_id": data["cc_id"]
                 },
                 "message": "Collaboration not found."
             }
