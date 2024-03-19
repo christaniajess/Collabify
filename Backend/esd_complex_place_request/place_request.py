@@ -102,6 +102,6 @@ def processPlaceRequest(collab):
 
 
 if __name__ == "__main__":
-    print("111111This is flask " + os.path.basename(__file__) + " for placing an order...")
+    print("This is flask " + os.path.basename(__file__) + " for placing an order...")
     app.run(host="0.0.0.0", port=5100, debug=True)
 

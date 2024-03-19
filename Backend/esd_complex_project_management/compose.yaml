@@ -1,5 +1,5 @@
 services:
-  complex_project_management:
+  complex_place_request:
     build:
       context: .
       dockerfile: Dockerfile

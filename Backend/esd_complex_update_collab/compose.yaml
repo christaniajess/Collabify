@@ -1,8 +1,8 @@
 services:
-  complex_project_management:
+  complex_update_request:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 3007:5100
+      - 3011:5100
