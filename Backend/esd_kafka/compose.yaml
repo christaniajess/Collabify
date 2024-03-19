@@ -1,0 +1,45 @@
+
+networks:
+  kafka-net:
+    driver: bridge
+    name: kafka-net
+
+
+services:
+  zookeeper:
+    image: zookeeper
+    hostname: zookeeper
+    networks:
+      - kafka-net
+
+
+  kafka:
+    restart: always
+    image: confluentinc/cp-kafka
+    hostname: kafka
+    networks:
+      - kafka-net
+    ports:
+      - 9092:9092
+    environment:
+
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 
+
+    depends_on:
+      - zookeeper
+
+
+  notification:
+    restart: always
+    hostname: notification
+    build: .
+    networks:
+      - kafka-net
+    ports:
+      - 3006:3000
+
+
+
+  

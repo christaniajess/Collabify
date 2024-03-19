@@ -1,0 +1,10 @@
+services:
+  project:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/project
+    ports:
+      - 3003:5000
