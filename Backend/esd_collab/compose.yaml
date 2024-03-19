@@ -1,0 +1,10 @@
+services:
+  collaboration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/collaboration
+    ports:
+      - 3001:5000

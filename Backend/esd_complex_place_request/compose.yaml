@@ -1,0 +1,8 @@
+services:
+  complex_place_request:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 3007:5100

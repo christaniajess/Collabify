@@ -1,0 +1,10 @@
+services:
+  review:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/review
+    ports:
+      - 3002:5000
