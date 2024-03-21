@@ -1,8 +1,0 @@
-services:
-  complex_view_cc_profile:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - 3004:5100

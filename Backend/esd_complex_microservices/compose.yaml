@@ -1,0 +1,53 @@
+services:
+  complex_brand_view_cc:
+    build:
+      context: ./esd_complex_brand_view_profile
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      complexServer: "172.28.110.113"
+      simpleServer: "172.28.110.113"
+    ports:
+      - 3009:5100
+
+  complex_place_request:
+    build:
+      context: ./esd_complex_place_request
+      dockerfile: Dockerfile
+    environment:
+      simpleServer: "172.28.110.113"
+    restart: always
+    ports:
+      - 3007:5100
+
+  # complex_project_management:
+  #   build:
+  #     context: ./esd_complex_project_management
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     simpleServer: "172.28.110.113"
+  #   restart: always
+  #   ports:
+  #     - 3012:5100
+
+
+
+  complex_update_request:
+    build:
+      context: ./esd_complex_update_collab
+      dockerfile: Dockerfile
+    environment:
+      simpleServer: "172.28.110.113"
+    restart: always
+    ports:
+      - 3011:5100
+
+  complex_view_cc_profile:
+    build:
+      context: ./esd_complex_view_cc_profile
+      dockerfile: Dockerfile
+    environment:
+      simpleServer: "172.28.110.113"
+    restart: always
+    ports:
+      - 3004:5100

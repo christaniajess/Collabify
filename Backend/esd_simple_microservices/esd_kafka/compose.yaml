@@ -1,0 +1,51 @@
+
+networks:
+  kafka-net:
+    driver: bridge
+    name: kafka-net
+
+
+services:
+  zookeeper:
+    image: zookeeper
+    hostname: zookeeper
+    networks:
+      - kafka-net
+
+
+  kafka:
+    restart: always
+    image: confluentinc/cp-kafka
+    hostname: kafka
+    networks:
+      - kafka-net
+    ports:
+      - 9092:9092
+    environment:
+
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 
+
+    depends_on:
+      - zookeeper
+
+
+  notification:
+    restart: always
+    hostname: notification
+    environment:
+      mailgunDomain: sandbox5314bb250fea415fbc2913ee0060a1f5.mailgun.org
+      mailgunAPIKeyID: b02bcf9f-d6c98002
+      mailgunAPIKey: 05bc8f30070e21bc684a40c3e143e144-b02bcf9f-d6c98002
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - kafka-net
+    ports:
+      - 3006:3000
+
+
+
+  

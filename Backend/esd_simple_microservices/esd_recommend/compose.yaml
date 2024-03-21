@@ -1,0 +1,10 @@
+services:
+  recommendation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - simpleServer=172.28.110.113
+    restart: always
+    ports:
+      - 3008:5000

@@ -1,8 +1,0 @@
-services:
-  complex_project_management:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - 3007:5100

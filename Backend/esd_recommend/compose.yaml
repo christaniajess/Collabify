@@ -1,8 +1,0 @@
-services:
-  recommendation:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - 3008:5000
