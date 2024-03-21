@@ -1,8 +1,0 @@
-services:
-  complex_brand_view_cc:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - 3009:5100
