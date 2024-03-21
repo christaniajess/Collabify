@@ -2,6 +2,7 @@
 
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger
 from os import environ
 
 app = Flask(__name__)
@@ -11,6 +12,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('dbURL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
 
 db = SQLAlchemy(app)
+
+app.config['SWAGGER'] = {
+    'title': 'Validation Microservice API',
+    'version': '1.0',
+    'openapi': '3.0.2',
+    'description': 'Validates user does not share existing stored data'
+}
+swagger = Swagger(app)
 
 #creating a new class
 class Project(db.Model):

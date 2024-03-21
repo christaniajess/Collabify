@@ -1,6 +1,7 @@
 import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
@@ -9,8 +10,16 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
 db = SQLAlchemy(app)
 
+app.config['SWAGGER'] = {
+    'title': 'Collaboration Microservice API',
+    'version': '1.0',
+    'openapi': '3.0.2',
+    'description': 'Manage collaborations between brands and content creators'
+}
+swagger = Swagger(app)
 
-class collaboration(db.Model):
+
+class Collaboration(db.Model):
     __tablename__ = 'collaboration'
 
     cc_id = db.Column(db.VARCHAR(100), nullable=True,primary_key=True)
@@ -29,15 +38,43 @@ class collaboration(db.Model):
         return dto
 
 # View All Collaboration
-@app.route("/collaboration")
-def get_all():
-    collablist = db.session.scalars(db.select(collaboration)).all()
-    if len(collablist):
+@app.route("/collaborations", methods=['GET'])
+def get_all_collaborations():
+    """
+    List all collaborations
+    ---
+    responses:
+        200:
+            description: A list of collaborations
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                cc_id:
+                                    type: string
+                                    description: Content creator ID
+                                brand_id:
+                                    type: string
+                                    description: Brand ID
+                                collab_title:
+                                    type: string
+                                    description: Title of the collaboration
+                                collab_status:
+                                    type: string
+                                    description: Status of the collaboration
+        404:
+            description: No collaborations found
+    """
+    collaboration_list = db.session.scalars(db.select(Collaboration)).all()
+    if len(collaboration_list):
         return jsonify(
             {
                 "code": 200,
                 "data": {
-                    "collaboration": [collaboration.json() for collaboration in collablist]
+                    "collaboration": [collaboration.json() for collaboration in collaboration_list]
                 }
             }
         )
@@ -49,17 +86,49 @@ def get_all():
     ), 404
 
 #View by Content Creator
-@app.route("/collaboration/cc/<int:cc_id>")
-def find_by_cc(cc_id):
-    
-    collabs = db.session.scalars(
-        db.select(collaboration).filter_by(cc_id=cc_id)).all()
-    
-    if collabs:
+@app.route("/collaborations/cc/<string:cc_id>", methods=['GET'])
+def get_collaborations_by_cc(cc_id):
+    """
+    Get collaboration by content creator ID
+    ---
+    parameters:
+        - in: path
+          name: cc_id
+          required: true
+          schema:
+            type: string
+    responses:
+        200:
+            description: Collaboration details by content creator ID
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                cc_id:
+                                    type: string
+                                    description: Content creator ID
+                                brand_id:
+                                    type: string
+                                    description: Brand ID
+                                collab_title:
+                                    type: string
+                                    description: Title of the collaboration
+                                collab_status:
+                                    type: string
+                                    description: Status of the collaboration
+        404:
+            description: Collaboration not found
+    """
+    collaborations = db.session.scalars(
+        db.select(Collaboration).filter_by(cc_id=cc_id)).all()
+    if collaborations:
         return jsonify(
             {
                 "code": 200,
-                "data": [collaboration.json() for collaboration in collabs]
+                "data": [collaboration.json() for collaboration in collaborations]
             }
 
         )
@@ -67,17 +136,52 @@ def find_by_cc(cc_id):
         {
             "code": 404,
             "data": {
-                "cc_id": cc_id
+                "cc_id": cc_id,
+                "message": "Collaboration not found."
             },
             "message": "Collaboration not found."
         }
     ), 404
 
 # View by Status
-@app.route("/collaboration/status/<string:collab_status>")
-def find_by_collab_status(collab_status):
+@app.route("/collaborations/status/<string:collab_status>", methods=["GET"])
+def get_collaboration_by_status(collab_status):
+    """
+    Get collaborations by status
+    ---
+    parameters:
+        - in: path
+          name: collab_status
+          required: true
+          schema:
+            type: string
+    responses:
+        200:
+            description: Collaboration data with the specified status
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                cc_id:
+                                    type: string
+                                    description: Content creator ID
+                                brand_id:
+                                    type: string
+                                    description: Brand ID
+                                collab_title:
+                                    type: string
+                                    description: Title of the collaboration
+                                collab_status:
+                                    type: string
+                                    description: Status of the collaboration
+        404:
+            description: Collaboration with the specified status not found
+    """
     collabs = db.session.scalars(
-        db.select(collaboration).filter_by(collab_status=collab_status))
+        db.select(Collaboration).filter_by(collab_status=collab_status)).all()
     if collabs:
         return jsonify(
             {
@@ -89,17 +193,52 @@ def find_by_collab_status(collab_status):
         {
             "code": 404,
             "data": {
-                "collab_status": collab_status
+                "collab_status": collab_status,
+                "message": "Collaboration not found."
             },
             "message": "Collaboration not found."
         }
     ), 404
 
 # View by Brand
-@app.route("/collaboration/brand/<int:brand_id>")
-def find_by_brand(brand_id):
+@app.route("/collaborations/brand/<string:brand_id>", methods=["GET"])
+def get_collaboration_by_brand(brand_id):
+    """
+    Get collaboration by brand ID
+    ---
+    parameters:
+        - in: path
+          name: brand_id
+          required: true
+          schema:
+            type: string
+    responses:
+        200:
+            description: Collaboration data for the specified brand
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                cc_id:
+                                    type: string
+                                    description: Content creator ID
+                                brand_id:
+                                    type: string
+                                    description: Brand ID
+                                collab_title:
+                                    type: string
+                                    description: Title of the collaboration
+                                collab_status:
+                                    type: string
+                                    description: Status of the collaboration
+        404:
+            description: Collaboration not found
+    """
     collabs = db.session.scalars(
-        db.select(collaboration).filter_by(brand_id=brand_id)).all()
+        db.select(Collaboration).filter_by(brand_id=brand_id)).all()
     if collabs:
         return jsonify(
             {
@@ -112,18 +251,47 @@ def find_by_brand(brand_id):
         {
             "code": 404,
             "data": {
-                "brand_id": brand_id
+                "brand_id": brand_id,
+                "message": "Collaboration not found."
             },
             "message": "Collaboration not found."
         }
     ), 404
 
 # Create a Collaboration
-@app.route("/collaboration", methods=["POST"])
+@app.route("/collaborations", methods=["POST"])
 def create_collaboration():
+    """
+    Create a new collaboration
+    ---
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        cc_id:
+                            type: string
+                            description: Content creator ID
+                        brand_id:
+                            type: string
+                            description: Brand ID
+                        collab_title:
+                            type: string
+                            description: Title of the collaboration
+                        collab_status:
+                            type: string
+                            description: Status of the collaboration
+    responses:
+        201:
+            description: Collaboration created successfully
+        500:
+            description: Error creating collaboration
+    """
     try: 
         data = request.get_json()
-        new_collaboration = collaboration(
+        new_collaboration = Collaboration(
             cc_id=data["cc_id"],
             brand_id=data["brand_id"],
             collab_title=data["collab_title"],
@@ -147,11 +315,38 @@ def create_collaboration():
         ), 500
 
 # Update Collaboration Status
-@app.route("/collaboration/status", methods=["PUT"])
+@app.route("/collaborations/status", methods=["PUT"])
 def update_collaboration_status():
+    """
+    Update collaboration status
+    ---
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                type: object
+                properties:
+                    cc_id:
+                        type: string
+                        description: Content creator ID
+                    brand_id:
+                        type: string
+                        description: Brand ID
+                    collab_status:
+                        type: string
+                        description: Status of the collaboration
+    responses:
+        200:
+            description: Collaboration status updated successfully
+        404:
+            description: Collaboration not found
+        500:
+            description: Error updating collaboration status
+    """
     data=request.get_json()
     collabs = db.session.scalars(
-        db.select(collaboration).filter_by(cc_id=data["cc_id"],brand_id=data["brand_id"]))
+        db.select(Collaboration).filter_by(cc_id=data["cc_id"],brand_id=data["brand_id"]))
     if collabs:
         try:
             collabs.collab_status = data["collab_status"]
@@ -175,7 +370,8 @@ def update_collaboration_status():
             {
                 "code": 404,
                 "data": {
-                    "cc_id": data["cc_id"]
+                    "cc_id": data["cc_id"],
+                     "message": "Collaboration not found."
                 },
                 "message": "Collaboration not found."
             }

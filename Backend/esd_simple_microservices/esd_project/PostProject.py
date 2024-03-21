@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger
 # import traceback
 from os import environ
 
@@ -10,6 +11,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('dbURL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
 
 db = SQLAlchemy(app)
+
+app.config['SWAGGER'] = {
+    'title': 'Project Microservice API',
+    'version': '1.0',
+    'openapi': '3.0.2',
+    'description': 'Manage projects of content creators'
+}
+swagger = Swagger(app)
 
 class Project(db.Model):
     __tablename__ = 'project'
@@ -35,6 +44,51 @@ class Project(db.Model):
 #creating a new project (this is after the have passed validation as this microservice is only invoked after it has passed validation)
 @app.route('/create_project/<string:user_id>', methods=['POST'])
 def create_project(user_id):
+    """
+    Create a project
+    ---
+    parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+        description: The unique identifier of the user creating the project.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              proj_name:
+                type: string
+                description: The name of the project.
+              proj_image:
+                type: string
+                description: URL to the project's representative image.
+              proj_description:
+                type: string
+                description: Detailed description of the project.
+    responses:
+      201:
+        description: Project created successfully. Returns the created project details.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                proj_name:
+                  type: string
+                proj_image:
+                  type: string
+                proj_description:
+                  type: string
+      500:
+        description: An error occurred while creating the project.
+    """
     data = request.get_json()
     project = Project(user_id=user_id, proj_name=data.get('proj_name'), proj_image=data.get('proj_image'), proj_description=data.get('proj_description'))
 
@@ -70,7 +124,43 @@ def create_project(user_id):
 #if user wants to edit after they created a new project (they cannot change project name!!)
 @app.route('/update_project/<string:user_id>/<string:proj_name>', methods =['PUT'])
 def update_project(user_id,proj_name):
-
+    """
+    Update a project
+    ---
+    parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+        description: The user ID of the project owner.
+      - in: path
+        name: proj_name
+        required: true
+        schema:
+          type: string
+        description: The name of the project to update.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              proj_image:
+                type: string
+                description: Updated URL to the project's image.
+              proj_description:
+                type: string
+                description: Updated project description.
+    responses:
+      200:
+        description: Project updated successfully.
+      404:
+        description: Project not found.
+      500:
+        description: An error occurred while updating the project.
+    """
     data = request.json
 
     proj_image = data.get('proj_image')
@@ -106,6 +196,30 @@ def update_project(user_id,proj_name):
 #deletion of the project
 @app.route('/delete_project/<string:user_id>/<string:proj_name>', methods=['DELETE'])
 def delete_project(user_id, proj_name):
+    """
+    Delete a project
+    ---
+    parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+        description: The user ID of the project owner.
+      - in: path
+        name: proj_name
+        required: true
+        schema:
+          type: string
+        description: The name of the project to be deleted.
+    responses:
+      200:
+        description: Project deleted successfully.
+      404:
+        description: Project not found.
+      500:
+        description: An error occurred while deleting the project.
+    """
     try:
         project = Project.query.filter_by(user_id=user_id, proj_name=proj_name).first()
 
@@ -132,6 +246,34 @@ def delete_project(user_id, proj_name):
 
 @app.route('/get_all_project', methods=['GET'])
 def get_all_project():
+    """
+    Get all projects
+    ---
+    responses:
+      200:
+        description: A list of all projects.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  proj_id:
+                    type: integer
+                  user_id:
+                    type: string
+                  proj_name:
+                    type: string
+                  proj_image:
+                    type: string
+                  proj_description:
+                    type: string
+      404:
+        description: No projects found.
+      500:
+        description: An error occurred while retrieving projects.
+    """
     try:
         project = Project.query.all()
         project_list = []
@@ -173,6 +315,41 @@ def get_all_project():
 
 @app.route('/get_project', methods=['GET'])
 def get_project():
+    """
+    Get projects by content creator ID
+    ---
+    parameters:
+      - in: query
+        name: cc_id
+        schema:
+          type: string
+        required: true
+        description: The content creator ID to retrieve projects for.
+    responses:
+      200:
+        description: A list of projects for the given content creator ID.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  proj_id:
+                    type: integer
+                  user_id:
+                    type: string
+                  proj_name:
+                    type: string
+                  proj_image:
+                    type: string
+                  proj_description:
+                    type: string
+      404:
+        description: No projects found for the given content creator ID.
+      500:
+        description: An error occurred while retrieving projects.
+    """
     try:
         cc_id = request.get_json()["cc_id"]
         project = Project.query.filter_by(user_id=cc_id).all()
@@ -197,7 +374,7 @@ def get_project():
         return jsonify(
             {
                 'code': 404,
-                'message': 'There are no projects for the given cc_id'
+                'data': 'There are no projects for the given cc_id',
             }
         )
 

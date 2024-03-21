@@ -1,14 +1,22 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flasgger import Swagger
 import os, sys
 import requests
 from invokes import invoke_http
 
 import json
 
-
 app = Flask(__name__)
 CORS(app)
+
+app.config['SWAGGER'] = {
+    'title': 'Place Request Complex Microservice API',
+    'version': '1.0',
+    'openapi': '3.0.2',
+    'description': 'Place requests for collaboration with selected content creator'
+}
+swagger = Swagger(app)
 
 blacklist_URL = "http://"+os.environ.get("simpleServer")+":3005/blacklist"
 notification_URL = "http://"+os.environ.get("simpleServer")+":3006"
@@ -17,6 +25,35 @@ collab_URL = "http://"+os.environ.get("simpleServer")+":3001/collaboration"
 
 @app.route("/place_request", methods=['POST'])
 def place_order():
+    """
+    Place a Collaboration Request
+    ---
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        cc_id:
+                            type: string
+                            description: The unique identifier of the content creator being requested for collaboration.
+                        brand_id:
+                            type: string
+                            description: The unique identifier of the brand initiating the collaboration request.
+                        details:
+                            type: string
+                            description: Details of the collaboration request.
+    responses:
+        201:
+            description: Collaboration request successfully placed. Notification sent to the content creator.
+        403:
+            description: The brand is blacklisted from requesting collaborations with this content creator.
+        400:
+            description: Invalid JSON input provided.
+        500:
+            description: Internal server error. Error occurred in the collaboration request process.
+    """
     if request.is_json:
         try:
             collab = request.get_json()

@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 import os
@@ -8,6 +9,14 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+app.config['SWAGGER'] = {
+    'title': 'Account Microservice API',
+    'version': '1.0',
+    'openapi': '3.0.2',
+    'description': 'Manage user accounts'
+}
+swagger = Swagger(app)
 
 class User(db.Model):
     __tablename__= "account"
@@ -21,8 +30,45 @@ class User(db.Model):
     interests = db.Column(db.Text)
 
 # Function to get all users and their details
-@app.route('/get_all_users', methods=['GET'])
-def get_all_users():
+@app.route('/users', methods=['GET'])
+def list_users():
+    """
+    List all users
+    ---
+    responses:
+        200:
+            description: A list of users
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                user_id:
+                                    type: integer
+                                    description: The unique identifier for a user
+                                username:
+                                    type: string
+                                    description: User's chosen username
+                                acc_type:
+                                    type: string
+                                    description: Account type
+                                full_name:
+                                    type: string
+                                    description: User's full name
+                                email:
+                                    type: string
+                                    description: User's email address
+                                user_photo:
+                                    type: string
+                                    description: URL to user's photo
+                                interests:
+                                    type: string
+                                    description: User's interests
+        500:
+            description: Internal Server Error
+    """
     try:
         users = User.query.all()
         user_list = []
@@ -52,8 +98,48 @@ def get_all_users():
         ), 500
 
 
-@app.route('/setup_account', methods=['POST'])
-def setup_account():
+@app.route('/users', methods=['POST'])
+def create_user():
+    """
+    Create a new user
+    ---
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        user_id:
+                            type: integer
+                            description: The unique identifier for a user                                        
+                        username:
+                            type: string
+                            description: User's chosen username
+                        acc_type:
+                            type: string
+                            description: Account type (e.g., admin, standard user)
+                        full_name:
+                            type: string
+                            description: User's full name
+                        email:
+                            type: string
+                            description: User's email address
+                        password:
+                            type: string
+                            description: User's password
+                        user_photo:
+                            type: string
+                            description: URL to user's photo
+                        interests:
+                            type: string
+                            description: User's interests
+    responses:
+        201:
+            description: Account created successfully
+        409:
+            description: Email already exists
+    """
     data = request.json
 
     user_id = data.get('user_id')
@@ -97,8 +183,49 @@ def setup_account():
         ), 409
 
 # Function to update user details
-@app.route('/update_user/<int:user_id>', methods=['PUT'])
+@app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
+    """
+    Update a user's details
+    ---
+    parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+            description: The unique identifier for a user
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        username:
+                            type: string
+                            description: User's chosen username
+                        acc_type:
+                            type: string
+                            description: Account type
+                        full_name:
+                            type: string
+                            description: User's full name
+                        email:
+                            type: string
+                            description: User's email address
+                        user_photo:
+                            type: string
+                            description: URL to user's photo
+                        interests:
+                            type: string
+                            description: User's interests
+    responses:
+        200:
+            description: User details updated successfully
+        404:
+            description: User not found
+    """
     try:
         user = User.query.get_or_404(user_id)
         data = request.json
@@ -117,13 +244,30 @@ def update_user(user_id):
         return jsonify(
             {
                 'code': 404,
+                'data': 'User not found',
                 'message': f'User not found: {str(e)}'
             }
         ), 404
 
 # Function to delete user
-@app.route('/delete_user/<int:user_id>', methods=['DELETE'])
+@app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
+    """
+    Delete a user
+    ---
+    parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+            description: The unique identifier for a user
+    responses:
+        200:
+            description: User deleted successfully
+        404:
+            description: User not found
+    """
     try:
         user = User.query.get_or_404(user_id)
         db.session.delete(user)
@@ -138,13 +282,56 @@ def delete_user(user_id):
         return jsonify(
             {
                 'code': 404,
+                'data': 'User not found',
                 'message': f'User not found: {str(e)}'
             }
         ), 404
 
 # Function to get user details by user_id
-@app.route('/get_user/<int:user_id>', methods=['GET'])
+@app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
+    """
+    Get a single user's details
+    ---
+    parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+            description: The unique identifier for a user
+    responses:
+        200:
+            description: User details retrieved successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            user_id:
+                                type: integer
+                                description: The unique identifier for a user
+                            username:
+                                type: string
+                                description: User's chosen username
+                            acc_type:
+                                type: string
+                                description: Account type
+                            full_name:
+                                type: string
+                                description: User's full name
+                            email:
+                                type: string
+                                description: User's email address
+                            user_photo:
+                                type: string
+                                description: URL to user's photo
+                            interests:
+                                type: string
+                                description: User's interests
+        404:
+            description: User not found
+    """
     print('FINDING USER!')
     try:
         user = User.query.get_or_404(user_id)
@@ -167,13 +354,58 @@ def get_user(user_id):
         return jsonify(
             {
                 'code': 404,
+                'data': 'User not found',
                 'message': f'User not found: {str(e)}'
             }
         ), 404
 
 # Function to get users by interests
-@app.route('/get_users_by_interests/<string:interests>', methods=['GET'])
+@app.route('/users/interests/<string:interests>', methods=['GET'])
 def get_users_by_interests(interests):
+    """
+    Get users by interests
+    ---
+    parameters:
+        - in: path
+          name: interests
+          required: true
+          schema:
+            type: string
+            description: User interests to filter by
+    responses:
+        200:
+            description: Users filtered by interests
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                user_id:
+                                    type: integer
+                                    description: The unique identifier for a user
+                                username:
+                                    type: string
+                                    description: User's chosen username
+                                acc_type:
+                                    type: string
+                                    description: Account type
+                                full_name:
+                                    type: string
+                                    description: User's full name
+                                email:
+                                    type: string
+                                    description: User's email address
+                                user_photo:
+                                    type: string
+                                    description: URL to user's photo
+                                interests:
+                                    type: string
+                                    description: User's interests
+        500:
+            description: Internal Server Error
+    """
     try:
         interest_list = interests.split(",")
         print(interest_list)

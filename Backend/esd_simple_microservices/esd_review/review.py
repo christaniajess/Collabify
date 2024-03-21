@@ -1,17 +1,25 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-# from flask_cors import CORS
+from flasgger import Swagger
 from datetime import datetime
 import os
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-# CORS(app)
+
+app.config['SWAGGER'] = {
+    'title': 'Review Microservice API',
+    'version': '1.0',
+    'openapi': '3.0.2',
+    'description': 'Manage reviews of content creators'
+}
+swagger = Swagger(app)
 
 class Review(db.Model):
-    __tablename__ = 'review'
+    __tablename__ = 'reviews'
 
     review_id = db.Column(db.Integer, primary_key=True)
     cc_id = db.Column(db.Integer, nullable=False)
@@ -41,10 +49,10 @@ class Review(db.Model):
             "timestamp": self.timestamp.isoformat() if self.timestamp else None
         }
 
-@app.route("/review", methods=['POST'])
+@app.route("/reviews", methods=['POST'])
 def create_review():
     """
-    Create a review
+    Create a new review
     ---
     requestBody:
         required: true
@@ -52,33 +60,31 @@ def create_review():
             application/json:
                 schema:
                     type: object
-                    required:
-                      - cc_id
-                      - brand_id
-                      - rating
-                      - title
-                      - content
                     properties:
                         cc_id:
                             type: integer
-                            description: ID of the content creator
+                            description: The unique identifier of the content creator being reviewed.
                         brand_id:
                             type: integer
-                            description: ID of the brand
+                            description: The unique identifier of the brand posting the review.
                         rating:
                             type: integer
-                            description: Rating given to the content creator
+                            description: The rating given to the content creator by the brand.
                         title:
                             type: string
-                            description: Title of the review
+                            description: The title of the review.
                         content:
                             type: string
-                            description: Content of the review
+                            description: The detailed content of the review.
     responses:
         201:
-            description: Review created
+            description: Review successfully created. Returns the details of the newly added review.
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Review'
         500:
-            description: Internal server error
+            description: An error occurred creating the review. Check the error details.
     """
     data = request.get_json()
     new_review = Review(**data)
@@ -90,21 +96,29 @@ def create_review():
         db.session.rollback()
         return jsonify({"code": 500, "message": "An error occurred creating the review.", "error": str(e)}), 500
 
-@app.route("/review/<int:cc_id>", methods=['GET'])
-def get_reviews_by_cc(cc_id):
-    """Retrieve all reviews for a specified content creator
+@app.route("/reviews/<int:cc_id>", methods=['GET'])
+def get_reviews_by_content_creator(cc_id):
+    """
+    Get reviews by content creator ID
     ---
     parameters:
-      - name: cc_id
-        in: path
-        required: true
-        type: integer
-        description: The content creator's ID
+        - in: path
+          name: cc_id
+          required: true
+          schema:
+            type: integer
+            description: The unique identifier of the content creator for whom reviews are being retrieved.
     responses:
-      200:
-        description: An array of reviews for the content creator
-      404:
-        description: No reviews found for the specified content creator
+        200:
+            description: Successfully retrieved an array of reviews for the specified content creator.
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/components/schemas/Review'
+        404:
+            description: No reviews found for the specified content creator.
     """
     reviews_query = db.session.query(Review).filter(Review.cc_id == cc_id).all()
     if reviews_query:
@@ -113,50 +127,43 @@ def get_reviews_by_cc(cc_id):
             "data": [review.json() for review in reviews_query]
         })
     else:
-        return jsonify({"code": 404, "message": "No reviews found for the specified content creator."}), 404
+        return jsonify({"code": 404,  "data": {"cc_id": cc_id, "message": "No reviews found for the specified content creator."}, "message": "No reviews found for the specified content creator."}), 404
 
-@app.route("/review/<int:review_id>", methods=['PUT'])
+@app.route("/reviews/<int:review_id>", methods=['PUT'])
 def update_review(review_id):
     """
-    Update a review by its ID
+    Update a review
     ---
     parameters:
-        -   in: path
-            name: review_id
-            required: true
-            schema:
-                type: integer
-                description: The review's unique identifier
+        - in: path
+          name: review_id
+          required: true
+          schema:
+            type: integer
+            description: The unique identifier of the review to be updated.
     requestBody:
-        description: Review's details to be updated
         required: true
         content:
             application/json:
                 schema:
                     type: object
                     properties:
-                        cc_id:
-                            type: integer
-                            description: Content Creator ID
-                        brand_id:
-                            type: integer
-                            description: Brand ID
                         rating:
                             type: integer
-                            description: Rating given to the content creator
+                            description: Updated rating for the review.
                         title:
                             type: string
-                            description: Title of the review
+                            description: Updated title of the review.
                         content:
                             type: string
-                            description: Detailed content of the review
+                            description: Updated detailed content of the review.
     responses:
         200:
-            description: Review updated successfully
+            description: Review successfully updated. Returns the updated details of the review.
         404:
-            description: Review not found
+            description: Review not found. The specified review ID does not exist.
         500:
-            description: Internal server error
+            description: An internal server error occurred while updating the review.
     """
     review_query = db.session.scalars(db.select(Review).filter_by(review_id=review_id)).first()
     if review_query:
@@ -166,27 +173,27 @@ def update_review(review_id):
         db.session.commit()
         return jsonify({"code": 200, "data": review_query.json()})
     else:
-        return jsonify({"code": 404, "message": "Review not found."}), 404
+        return jsonify({"code": 404, "data": {"review_id": review_id, "message": "Review not found."}, "message": "Review not found."}), 404
 
-@app.route("/review/<int:review_id>", methods=['DELETE'])
+@app.route("/reviews/<int:review_id>", methods=['DELETE'])
 def delete_review(review_id):
     """
-    Delete a review by its ID
+    Delete a review
     ---
     parameters:
-        -   in: path
-            name: review_id
-            required: true
-            schema:
-                type: integer
-                description: The review's unique identifier
+        - in: path
+          name: review_id
+          required: true
+          schema:
+            type: integer
+            description: The unique identifier of the review to be deleted.
     responses:
         200:
-            description: Review deleted successfully
+            description: Review successfully deleted.
         404:
-            description: Review not found
+            description: Review not found. The specified review ID does not exist.
         500:
-            description: Internal server error
+            description: An internal server error occurred while deleting the review.
     """
     review_query = db.session.scalars(db.select(Review).filter_by(review_id=review_id)).first()
     if review_query:
@@ -194,7 +201,7 @@ def delete_review(review_id):
         db.session.commit()
         return jsonify({"code": 200, "message": "Review successfully deleted."})
     else:
-        return jsonify({"code": 404, "message": "Review not found."}), 404
+        return jsonify({"code": 404, "data":{"review_id": review_id, "message": "Review not found."}, "message": "Review not found."}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
