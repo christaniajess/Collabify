@@ -1,16 +1,16 @@
 <template>
-  <LandingPage/>
+  <MenuBar/>
   <HelloWorld msg="Welcome to Your Vue.js App"/>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-import LandingPage from './components/LandingPage.vue'
+import MenuBar from './components/MenuBar.vue'
 
 export default {
   name: 'App',
   components: {
-    LandingPage,
+    MenuBar,
     HelloWorld
   }
 }
