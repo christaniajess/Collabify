@@ -4,7 +4,7 @@
 </script>
 
 <template>
-  <HelloWorld></HelloWorld>
+  
 </template>
 
 <style scoped>
