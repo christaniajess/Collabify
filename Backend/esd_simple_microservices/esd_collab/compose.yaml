@@ -5,6 +5,6 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/collaboration
+      dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/collaboration
     ports:
       - 3001:5000
