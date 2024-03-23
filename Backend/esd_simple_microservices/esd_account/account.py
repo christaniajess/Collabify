@@ -4,12 +4,14 @@ from flasgger import Swagger
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 import os
+from flask_cors import CORS
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
+CORS(app)
 app.config['SWAGGER'] = {
     'title': 'Account Microservice API',
     'version': '1.0',

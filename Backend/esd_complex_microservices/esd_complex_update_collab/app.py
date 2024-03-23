@@ -3,10 +3,11 @@ import os, sys
 import requests
 from flasgger import Swagger
 from invokes import invoke_http
-
+from flask_cors import CORS
 import json
 
 app = Flask(__name__)
+CORS(app)
 app.config['SWAGGER'] = {
     'title': 'Update Collaboration Complex Microservice API',
     'version': '1.0',
