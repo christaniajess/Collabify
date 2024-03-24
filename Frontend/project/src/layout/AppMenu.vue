@@ -16,9 +16,14 @@ const model = ref([
             icon: 'pi pi-fw pi-pencil',
             // dont have to change the url now, jm will do
             to: '/Collab'
+        },
+
+        {
+            label: 'Blacklist',
+            icon: 'pi pi-fw pi-pencil',
+            // dont have to change the url now, jm will do
+            to: '/Blacklist'
         }
-
-
 
 
         ]

@@ -1,35 +1,38 @@
 <script setup>
 import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount } from 'vue';
-
+import {Ports, MicroService} from '@/service/Constant.js';
 import axios from 'axios';
 
 
 const filters = ref({});
-const collab = ref([]);
-
-const getCollabInfo = async () => {
+const blacklist = ref([]);
+const getblacklistInfo = async () => {
     try {
-        const response = await axios.get('http://localhost:3001/collaborations');
-        console.log(response.data["data"]);
-        collab.value = response.data["data"]["collaboration"];
-        collab.value.forEach((item, index) => {
+        const response = await axios.get(MicroService["simple"] + Ports["blacklist"] + '/blacklist/all');
+
+        var data = response.data["data"]["records"];
+        data.forEach((item, index) => {
             item.sn = index + 1;
         });
+
+        blacklist.value = data;
+        return data;
     } catch (error) {
         console.error(error);
     }
 };
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
     initFilters();
 
+
 });
+
 
 onMounted(async () => {
-    await getCollabInfo();
+    getblacklistInfo();
 });
-
 
 const initFilters = () => {
     filters.value = {
@@ -39,10 +42,8 @@ const initFilters = () => {
 
 const columns = ref([
     { field: 'sn', header: 'S/N' },
-    { field: 'cc_id', header: 'Content Creator' },
-    { field: 'collab_title', header: 'Title' },
-    { field: 'collab_status', header: 'Status' }
-
+    { field: 'banned_account', header: 'Banned Account' },
+    { field: 'date', header: 'Date' },
 ]);
 
 
@@ -50,28 +51,14 @@ const columns = ref([
 
 <template>
 
-
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                <!-- <Toolbar class="mb-4">
-                    <template v-slot:start>
-                        <div class="my-2">
-                            <Button label="New" icon="pi pi-plus" class="mr-2" severity="success" @click="openNew" />
-                            <Button label="Delete" icon="pi pi-trash" severity="danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
-                        </div>
-                    </template>
 
-                    <template v-slot:end>
-                        <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block" />
-                        <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" />
-                    </template>
-                </Toolbar> -->
 
                 <DataTable
                     ref="dt"
-                    :value="collab"
-                    v-model:selection="selectedProducts"
+                    :value="blacklist"
                     dataKey="id"
                     :paginator="true"
                     :rows="10"
@@ -80,6 +67,8 @@ const columns = ref([
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                 >
+                    {{ slotProps }}
+
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">Manage Products</h5>
@@ -90,16 +79,21 @@ const columns = ref([
                         </div>
                     </template>
 
-                    <!-- <Column selectionMode="multiple" headerStyle="width: 3rem"></Column> -->
 
 
                     <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
                     
-                    
+                    <Column headerStyle="width:14%;"     >
+                        <template #body >
+                            <div class="flex flex-wrap gap-2">
+                                <Button label="Remove" severity="danger" />
+                            </div>
+                        </template>
+                    </Column>
                     <!-- <Column field="S/N" header="S/N" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="collab">
+                        <template #body="blacklist">
                             <span class="p-column-title">S/N</span>
-                            {{ collab.name }}
+                            {{ blacklist.name }}
                         </template>
                     </Column>
                     <Column field="Content Creator" header="Content Creator" :sortable="true" headerStyle="width:14%; min-width:10rem;">
@@ -158,16 +152,6 @@ const columns = ref([
                         </template>
                     </Column> -->
                 </DataTable>
-
-
-
-
-
-
-
-
-
-
 
 
 
