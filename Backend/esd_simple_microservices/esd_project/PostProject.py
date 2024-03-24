@@ -3,8 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
 # import traceback
 from os import environ
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 portNumber = 5000
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('dbURL')
 #'mysql+mysqlconnector://root:root@localhost:3306/project'

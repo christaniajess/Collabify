@@ -3,8 +3,12 @@ from flask import Flask, request, jsonify
 from flasgger import Swagger
 import requests 
 import os
+from flask_cors import CORS
+
+
 app = Flask(__name__)
-portNum = 5005
+CORS(app)
+portNum = 5100
 
 app.config['SWAGGER'] = {
     'title': 'Project Management Complex Microservice API',
