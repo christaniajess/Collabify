@@ -137,6 +137,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/Collab.vue')
                 },
                 {
+                    path: '/blacklist',
+                    name: 'blacklist',
+                    component: () => import('@/views/pages/Blacklist.vue')
+                },
+                {
                     path: '/documentation',
                     name: 'documentation',
                     component: () => import('@/views/utilities/Documentation.vue')
