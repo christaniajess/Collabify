@@ -1,7 +1,6 @@
 # Collabify
 <p align="center">
   <img src="Frontend\Readme_files\logo.jpg" width=200px>
-  <img src="Fronten>
 </p>
 
 
