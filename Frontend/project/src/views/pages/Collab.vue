@@ -1,36 +1,46 @@
 <script setup>
 import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount } from 'vue';
-import ProductService from '@/service/ProductService';
-import { useToast } from 'primevue/usetoast';
+import { Ports, MicroService } from '@/service/Constant.js';
+
 import axios from 'axios';
 
-const toast = useToast();
-
-const products = ref(null);
-const productDialog = ref(false);
-const deleteProductDialog = ref(false);
-const deleteProductsDialog = ref(false);
-const product = ref({});
-const selectedProducts = ref(null);
-const dt = ref(null);
 const filters = ref({});
-const submitted = ref(false);
-const statuses = ref([
-    { label: 'INSTOCK', value: 'instock' },
-    { label: 'LOWSTOCK', value: 'lowstock' },
-    { label: 'OUTOFSTOCK', value: 'outofstock' }
-]);
 const collab = ref([]);
+const loaded = ref(false);
+const account = ref('123');
+const collab_status = [
+    { name: 'In-progress', code: 'In-progress' },
+    { name: 'Done', code: 'Done' }
+];
+const selectedStatus = ref();
 
-const fetchData = async () => {
+const getCollabInfo = async () => {
     try {
-        const response = await axios.get('http://localhost:3001/collaborations');
-        console.log(response.data["data"]);
-        collab.value = response.data["data"]["collaboration"];
+        const response = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
+        console.log(response.data['data']);
+        collab.value = response.data['data'];
         collab.value.forEach((item, index) => {
             item.sn = index + 1;
+            item.edit_visible = false;
         });
+        loaded.value = true;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const update_status = async (brand_id) => {
+    try {
+
+        const response = await axios.put(MicroService['simple'] + Ports['collab'] + '/collaborations/status', {
+            cc_id: account.value,
+            brand_id: brand_id,
+            collab_status: selectedStatus.value.code
+        });
+
+        console.log(response.data);
+        getCollabInfo();
     } catch (error) {
         console.error(error);
     }
@@ -38,16 +48,11 @@ const fetchData = async () => {
 
 onBeforeMount(() => {
     initFilters();
-
 });
 
 onMounted(async () => {
-    await fetchData();
+    await getCollabInfo();
 });
-
-
-
-
 
 const initFilters = () => {
     filters.value = {
@@ -55,31 +60,18 @@ const initFilters = () => {
     };
 };
 
-
-
-
-
-
-
-
-
 const columns = ref([
     { field: 'sn', header: 'S/N' },
     { field: 'cc_id', header: 'Content Creator' },
     { field: 'collab_title', header: 'Title' },
     { field: 'collab_status', header: 'Status' }
-
 ]);
-
-
 </script>
 
 <template>
-
-
     <div class="grid">
         <div class="col-12">
-            <div class="card">
+            <div class="card" v-if="loaded">
                 <!-- <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
@@ -97,7 +89,6 @@ const columns = ref([
                 <DataTable
                     ref="dt"
                     :value="collab"
-                    v-model:selection="selectedProducts"
                     dataKey="id"
                     :paginator="true"
                     :rows="10"
@@ -118,177 +109,44 @@ const columns = ref([
 
                     <!-- <Column selectionMode="multiple" headerStyle="width: 3rem"></Column> -->
 
-
                     <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
-                    
-                    
-                    <!-- <Column field="S/N" header="S/N" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="collab">
-                            <span class="p-column-title">S/N</span>
-                            {{ collab.name }}
+
+                    <Column headerStyle="width:14%;">
+                        <template #body="slotProps">
+                            <div class="flex flex-wrap gap-2">
+                                <Button label="View" v-if="slotProps.data.collab_status != 'rejected'" />
+                                <Button label="Edit" severity="warning" v-if="slotProps.data.collab_status != 'rejected'" @click="slotProps.data.edit_visible = true" />
+
+                                <Dialog v-model:visible="slotProps.data.edit_visible" modal header="Edit Collab" :style="{ width: '25rem' }">
+                                    <span class="p-text-secondary block mb-5">{{ slotProps.cc_id }}</span>
+                                    <div class="flex align-items-center gap-3 mb-3">
+                                        <label for="username" class="font-semibold w-6rem">Banned Account{{ slotProps.data.cc_id }}</label>
+                                        {{ slotProps.data.banned_account }}
+                                    </div>
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <label for="email" class="font-semibold w-6rem">Status</label>
+                                        <Dropdown v-model="selectedStatus" :options="collab_status" optionLabel="name" placeholder="Select a Status" class="w-full md:w-14rem" />
+                                    </div>
+                                    <div class="flex justify-content-end gap-2">
+                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.visible = false"></Button>
+                                        <Button
+                                            type="button"
+                                            severity="danger"
+                                            label="Update"
+                                            @click="
+                                                update_status(slotProps.data.brand_id);
+                                                slotProps.data.visible = false;
+                                            "
+                                        ></Button>
+                                    </div>
+                                </Dialog>
+
+                                <Button label="Remove" severity="danger" v-if="slotProps.data.collab_status == 'rejected'" />
+                                <Button label="Remove" severity="danger" v-if="slotProps.data.collab_status == 'In-progress'" />
+                            </div>
                         </template>
                     </Column>
-                    <Column field="Content Creator" header="Content Creator" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Content Creator</span>
-                            {{ slotProps.data.name }}
-                        </template>
-                    </Column>
-
-                    <Column field="Title" header="Title" :sortable="true" headerStyle="width:14%; min-width:8rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Title</span>
-                            {{ formatCurrency(slotProps.data.price) }}
-                        </template>
-                    </Column>
-                    <Column field="Status" header="Status" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Status</span>
-                            {{ slotProps.data.category }}
-                        </template>
-                    </Column> -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    <!-- <Column field="rating" header="Reviews" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Rating</span>
-                            <Rating :modelValue="slotProps.data.rating" :readonly="true" :cancel="false" />
-                        </template>
-                    </Column> -->
-                    <!-- <Column field="inventoryStatus" header="Status" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Status</span>
-                            <Tag :severity="getBadgeSeverity(slotProps.data.inventoryStatus)">{{ slotProps.data.inventoryStatus }}</Tag>
-                        </template>
-                    </Column> -->
-                    <!-- <Column headerStyle="min-width:10rem;">
-                        <template #body="slotProps">
-                            <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editProduct(slotProps.data)" />
-                            <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteProduct(slotProps.data)" />
-                        </template>
-                    </Column> -->
                 </DataTable>
-
-
-
-
-
-
-
-
-
-
-
-
-
-                <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Product Details" :modal="true" class="p-fluid">
-                    <img :src="'/demo/images/product/' + product.image" :alt="product.image" v-if="product.image" width="150" class="mt-0 mx-auto mb-5 block shadow-2" />
-                    <div class="field">
-                        <label for="name">Name</label>
-                        <InputText id="name" v-model.trim="product.name" required="true" autofocus :invalid="submitted && !product.name" />
-                        <small class="p-invalid" v-if="submitted && !product.name">Name is required.</small>
-                    </div>
-                    <div class="field">
-                        <label for="description">Description</label>
-                        <Textarea id="description" v-model="product.description" required="true" rows="3" cols="20" />
-                    </div>
-
-                    <div class="field">
-                        <label for="inventoryStatus" class="mb-3">Inventory Status</label>
-                        <Dropdown id="inventoryStatus" v-model="product.inventoryStatus" :options="statuses" optionLabel="label" placeholder="Select a Status">
-                            <template #value="slotProps">
-                                <div v-if="slotProps.value && slotProps.value.value">
-                                    <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
-                                </div>
-                                <div v-else-if="slotProps.value && !slotProps.value.value">
-                                    <span :class="'product-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value }}</span>
-                                </div>
-                                <span v-else>
-                                    {{ slotProps.placeholder }}
-                                </span>
-                            </template>
-                        </Dropdown>
-                    </div>
-
-                    <div class="field">
-                        <label class="mb-3">Category</label>
-                        <div class="formgrid grid">
-                            <div class="field-radiobutton col-6">
-                                <RadioButton id="category1" name="category" value="Accessories" v-model="product.category" />
-                                <label for="category1">Accessories</label>
-                            </div>
-                            <div class="field-radiobutton col-6">
-                                <RadioButton id="category2" name="category" value="Clothing" v-model="product.category" />
-                                <label for="category2">Clothing</label>
-                            </div>
-                            <div class="field-radiobutton col-6">
-                                <RadioButton id="category3" name="category" value="Electronics" v-model="product.category" />
-                                <label for="category3">Electronics</label>
-                            </div>
-                            <div class="field-radiobutton col-6">
-                                <RadioButton id="category4" name="category" value="Fitness" v-model="product.category" />
-                                <label for="category4">Fitness</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="formgrid grid">
-                        <div class="field col">
-                            <label for="price">Price</label>
-                            <InputNumber id="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" :invalid="submitted && !product.price" :required="true" />
-                            <small class="p-invalid" v-if="submitted && !product.price">Price is required.</small>
-                        </div>
-                        <div class="field col">
-                            <label for="quantity">Quantity</label>
-                            <InputNumber id="quantity" v-model="product.quantity" integeronly />
-                        </div>
-                    </div>
-                    <template #footer>
-                        <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
-                        <Button label="Save" icon="pi pi-check" text="" @click="saveProduct" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product"
-                            >Are you sure you want to delete <b>{{ product.name }}</b
-                            >?</span
-                        >
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" text @click="deleteProduct" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete the selected products?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
-                    </template>
-                </Dialog>
             </div>
         </div>
     </div>

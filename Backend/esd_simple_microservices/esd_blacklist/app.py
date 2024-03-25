@@ -34,8 +34,9 @@ class Blacklist(db.Model):
     def json(self):
         return {"account": self.account, "banned_account": self.banned_account, "date": self.date}
 
-@app.route("/")
+@app.route("/",methods=['get'])
 def home():
+    print(request.args.get("account"))
     return "Hello, this is the book service!"
 
 
@@ -126,9 +127,9 @@ def find_by_account():
         404:
             description: No matching blacklist records found.
     """
-    account = request.args.get('account')
-    banned_account = request.args.get('banned_account')
-    blacklist = db.session.scalars(db.select(Blacklist).filter_by(account=account, banned_account=banned_account)).all()
+    account = request.args.get('account')   
+    print(account)
+    blacklist = db.session.scalars(db.select(Blacklist).filter_by(account=account)).all()
 
     if blacklist:
         return jsonify(
@@ -176,7 +177,6 @@ def create_blacklist():
         500:
             description: Internal server error occurred while creating the blacklist record.
     """
-    print(request.get_json())
     data = request.get_json()
     account = data['account']
     banned_account = data['banned_account']

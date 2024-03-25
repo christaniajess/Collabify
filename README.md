@@ -1,10 +1,11 @@
 # Collabify
 <p align="center">
-  <img src="Frontend\Readme_files\logo.jpeg" width=200px>
+  <img src="Frontend\Readme_files\logo.jpg" width=600px>
 </p>
 
 
 # Project Overview
+
 1. [Project Report & API Docs](https://docs.google.com/document/d/1qe-v97qh0Op3Mk3ixpWzRCELSHMURxqcJao1n8w-aEI/edit)
 2. [Project Slides]()
 3. [Project Video]()

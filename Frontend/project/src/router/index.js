@@ -137,6 +137,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/Collab.vue')
                 },
                 {
+                    path: '/blacklist',
+                    name: 'blacklist',
+                    component: () => import('@/views/pages/Blacklist.vue')
+                },
+                {
                     path: '/documentation',
                     name: 'documentation',
                     component: () => import('@/views/utilities/Documentation.vue')
@@ -157,17 +162,17 @@ const router = createRouter({
         {
             path: '/auth/login',
             name: 'login',
-            component: () => import('@/views/pages/auth/Login.vue')
+            component: () => import('@/views/auth/Login.vue')
         },
         {
             path: '/auth/access',
             name: 'accessDenied',
-            component: () => import('@/views/pages/auth/Access.vue')
+            component: () => import('@/views/auth/Access.vue')
         },
         {
             path: '/auth/error',
             name: 'error',
-            component: () => import('@/views/pages/auth/Error.vue')
+            component: () => import('@/views/auth/Error.vue')
         }
     ]
 });
