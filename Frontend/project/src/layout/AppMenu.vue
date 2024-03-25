@@ -7,35 +7,23 @@ const model = ref([
     {
         label: 'ESD - find a nice page from below, go layout/AppMenu.vue, put the json inside',
         items: [
-        {   label: 'Dashboard', 
-            icon: 'pi pi-fw pi-home', 
-            to: '/' },
+            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
 
-        {
-            label: 'Collab',
-            icon: 'pi pi-fw pi-pencil',
-            // dont have to change the url now, jm will do
-            to: '/Collab'
-        },
+            {
+                label: 'Collab',
+                icon: 'pi pi-fw pi-pencil',
+                // dont have to change the url now, jm will do
+                to: '/Collab'
+            },
 
-        {
-            label: 'Blacklist',
-            icon: 'pi pi-fw pi-pencil',
-            // dont have to change the url now, jm will do
-            to: '/Blacklist'
-        }
-
-
+            {
+                label: 'Blacklist',
+                icon: 'pi pi-fw pi-pencil',
+                // dont have to change the url now, jm will do
+                to: '/Blacklist'
+            }
         ]
-
-
     },
-
-
-
-
-
-
 
     {
         label: 'References',

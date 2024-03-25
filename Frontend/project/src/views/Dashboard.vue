@@ -1,20 +1,29 @@
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue';
+import { useRouter } from 'vue-router'
 
-
-
-
-const items = ref([
-    { label: 'Add New', icon: 'pi pi-fw pi-plus' },
-    { label: 'Remove', icon: 'pi pi-fw pi-minus' }
-]);
+const id = ref('');
+const router=useRouter();
+onMounted(() => {
+    if (localStorage.id) {
+        id.value = localStorage.id;
+    }
+    else{
+        router.push('/auth/login');
+    }
+});
+watch(
+    () => id.value,
+    (newId) => {
+        localStorage.id = newId;
+    }
+);
 
 onMounted(() => {
+    if (localStorage.id) {
+        id.value = localStorage.id;
+    }
 });
-
-const formatCurrency = (value) => {
-    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-};
 
 
 
@@ -22,12 +31,12 @@ const formatCurrency = (value) => {
 
 <template>
     <div class="grid">
-        <div class="col-12 lg:col-6 xl:col-3">
+        <div class="col-12 lg:col-6 xl:col-8">
             <div class="card mb-0">
                 <div class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Orders</span>
-                        <div class="text-900 font-medium text-xl">152</div>
+                        <div class="text-900 font-medium text-xl">{{ id }}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
@@ -37,7 +46,7 @@ const formatCurrency = (value) => {
                 <span class="text-500">since last visit</span>
             </div>
         </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <div class="flex justify-content-between mb-3">
                     <div>
@@ -52,41 +61,11 @@ const formatCurrency = (value) => {
                 <span class="text-500">since last week</span>
             </div>
         </div>
-        <div class="col-12 lg:col-6 xl:col-3">
-            <div class="card mb-0">
-                <div class="flex justify-content-between mb-3">
-                    <div>
-                        <span class="block text-500 font-medium mb-3">Customers</span>
-                        <div class="text-900 font-medium text-xl">28441</div>
-                    </div>
-                    <div class="flex align-items-center justify-content-center bg-cyan-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-inbox text-cyan-500 text-xl"></i>
-                    </div>
-                </div>
-                <span class="text-green-500 font-medium">520 </span>
-                <span class="text-500">newly registered</span>
-            </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3">
-            <div class="card mb-0">
-                <div class="flex justify-content-between mb-3">
-                    <div>
-                        <span class="block text-500 font-medium mb-3">Comments</span>
-                        <div class="text-900 font-medium text-xl">152 Unread</div>
-                    </div>
-                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-comment text-purple-500 text-xl"></i>
-                    </div>
-                </div>
-                <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span>
-            </div>
-        </div>
 
         <div class="col-12 xl:col-6">
             <div class="card">
                 <h5>Recent Sales</h5>
-                <DataTable :value="products" :rows="5" :paginator="true" responsiveLayout="scroll">
+                <DataTable  :rows="5" :paginator="true" responsiveLayout="scroll">
                     <Column style="width: 15%">
                         <template #header> Image </template>
                         <template #body="slotProps">
@@ -190,16 +169,22 @@ const formatCurrency = (value) => {
                     </li>
                 </ul>
             </div>
-        </div>
-        <div class="col-12 xl:col-6">
-
+        </div> -->
+        <div class="col-12 xl:col-4">
+            <div class="card mb-3">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <h3>Welcome,</h3>
+                        <div class="text-900 font-medium text-xl">{{id}}</div>
+                    </div>
+          
+                </div>
+                <Button label="View Profile" />
+            </div>
             <div class="card">
                 <div class="flex align-items-center justify-content-between mb-4">
                     <h5>Notifications</h5>
-                    <div>
-                        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu1.toggle($event)"></Button>
-                        <Menu ref="menu1" :popup="true" :model="items"></Menu>
-                    </div>
+
                 </div>
 
                 <span class="block text-600 font-medium mb-3">TODAY</span>
@@ -221,29 +206,7 @@ const formatCurrency = (value) => {
                     </li>
                 </ul>
 
-                <span class="block text-600 font-medium mb-3">YESTERDAY</span>
-                <ul class="p-0 m-0 list-none">
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-dollar text-xl text-blue-500"></i>
-                        </div>
-                        <span class="text-900 line-height-3"
-                            >Keyser Wick
-                            <span class="text-700">has purchased a black jacket for <span class="text-blue-500">59$</span></span>
-                        </span>
-                    </li>
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-pink-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-question text-xl text-pink-500"></i>
-                        </div>
-                        <span class="text-900 line-height-3"
-                            >Jane Davis
-                            <span class="text-700">has posted a new questions about your product.</span>
-                        </span>
-                    </li>
-                </ul>
             </div>
-
         </div>
     </div>
 </template>
