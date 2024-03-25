@@ -1,23 +1,54 @@
 <script setup>
 import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount } from 'vue';
-import {Ports, MicroService} from '@/service/Constant.js';
+import { Ports, MicroService } from '@/service/Constant.js';
 import axios from 'axios';
-
 
 const filters = ref({});
 const blacklist = ref([]);
+const loaded = ref(false);
+const account = ref('123');
+
 const getblacklistInfo = async () => {
-    try {
-        const response = await axios.get(MicroService["simple"] + Ports["blacklist"] + '/blacklist/all');
+    let data = {
+        account: account.value
+    };
 
-        var data = response.data["data"]["records"];
-        data.forEach((item, index) => {
-            item.sn = index + 1;
+    let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: MicroService['simple'] + Ports['blacklist'] + '/blacklist',
+        params: data
+    };
+
+    axios
+        .request(config)
+        .then((response) => {
+            console.log(response['data']['data']);
+            var result = response.data['data'];
+            result.forEach((item, index) => {
+                item.sn = index + 1;
+                item.visible = false;
+            });
+
+            blacklist.value = result;
+            loaded.value = true;
+        })
+        .catch((error) => {
+            console.log(error);
         });
+};
 
-        blacklist.value = data;
-        return data;
+const remove_blacklist = async (banned_account) => {
+    try {
+        const payload = {
+            account: account.value,
+            banned_account: banned_account
+        };
+        const response = await axios.delete(MicroService['simple'] + Ports['blacklist'] + '/blacklist', { data: payload });
+
+        console.log(response.data);
+        getblacklistInfo();
     } catch (error) {
         console.error(error);
     }
@@ -25,10 +56,7 @@ const getblacklistInfo = async () => {
 
 onBeforeMount(async () => {
     initFilters();
-
-
 });
-
 
 onMounted(async () => {
     getblacklistInfo();
@@ -43,19 +71,14 @@ const initFilters = () => {
 const columns = ref([
     { field: 'sn', header: 'S/N' },
     { field: 'banned_account', header: 'Banned Account' },
-    { field: 'date', header: 'Date' },
+    { field: 'date', header: 'Date' }
 ]);
-
-
 </script>
 
 <template>
-
     <div class="grid">
         <div class="col-12">
             <div class="card">
-
-
                 <DataTable
                     ref="dt"
                     :value="blacklist"
@@ -67,8 +90,6 @@ const columns = ref([
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                 >
-                    {{ slotProps }}
-
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">Manage Products</h5>
@@ -79,14 +100,34 @@ const columns = ref([
                         </div>
                     </template>
 
-
-
                     <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
-                    
-                    <Column headerStyle="width:14%;"     >
-                        <template #body >
+                    <Column headerStyle="width:14%;">
+                        <template #body="slotProps">
                             <div class="flex flex-wrap gap-2">
-                                <Button label="Remove" severity="danger" />
+                                <Button label="Edit" severity="warning" @click="slotProps.data.visible = true" />
+                                <Dialog v-model:visible="slotProps.data.visible" modal header="Remove Blacklist" :style="{ width: '25rem' }">
+                                    <span class="p-text-secondary block mb-5">{{ slotProps.cc_id }}</span>
+                                    <div class="flex align-items-center gap-3 mb-3">
+                                        <label for="username" class="font-semibold w-6rem">Banned Account{{ slotProps.data.cc_id }}</label>
+                                        {{ slotProps.data.banned_account }}
+                                    </div>
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <label for="email" class="font-semibold w-6rem">Banned Date</label>
+                                        {{ slotProps.data.date }}
+                                    </div>
+                                    <div class="flex justify-content-end gap-2">
+                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.visible = false"></Button>
+                                        <Button
+                                            type="button"
+                                            severity="danger"
+                                            label="Remove"
+                                            @click="
+                                                remove_blacklist(slotProps.data.banned_account);
+                                                slotProps.data.visible = false;
+                                            "
+                                        ></Button>
+                                    </div>
+                                </Dialog>
                             </div>
                         </template>
                     </Column>
@@ -116,23 +157,6 @@ const columns = ref([
                         </template>
                     </Column> -->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     <!-- <Column field="rating" header="Reviews" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Rating</span>
@@ -152,9 +176,6 @@ const columns = ref([
                         </template>
                     </Column> -->
                 </DataTable>
-
-
-
             </div>
         </div>
     </div>

@@ -8,6 +8,8 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
+# app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://root@localhost:3306/collaboration"
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
@@ -350,13 +352,17 @@ def update_collaboration_status():
         500:
             description: Error updating collaboration status
     """
+    
     data=request.get_json()
+    print(data)
     collabs = db.session.scalars(
-        db.select(Collaboration).filter_by(cc_id=data["cc_id"],brand_id=data["brand_id"]))
+        db.select(Collaboration).filter_by(cc_id=data["cc_id"],brand_id=data["brand_id"])).first()
     if collabs:
         try:
             collabs.collab_status = data["collab_status"]
             db.session.commit()
+            
+            
             return jsonify(
                 {
                     "code": 200,
