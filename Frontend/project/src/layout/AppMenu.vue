@@ -21,6 +21,13 @@ const model = ref([
                 icon: 'pi pi-fw pi-pencil',
                 // dont have to change the url now, jm will do
                 to: '/Blacklist'
+            },
+
+            {
+                label: 'Search',
+                icon: 'pi pi-fw pi-pencil',
+                // dont have to change the url now, jm will do
+                to: '/brandsearch'
             }
         ]
     },
