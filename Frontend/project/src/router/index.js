@@ -147,9 +147,9 @@ const router = createRouter({
                     component: () => import('@/views/pages/BrandSearchCC.vue')
                 },
                 {
-                    path: '/postproject',
-                    name: 'postproject',
-                    component: () => import('@/views/pages/PostProject.vue')
+                    path: '/viewprojects',
+                    name: 'viewprojects',
+                    component: () => import('@/views/pages/CCViewProjects.vue')
                 },
                 {
                     path: '/documentation',
