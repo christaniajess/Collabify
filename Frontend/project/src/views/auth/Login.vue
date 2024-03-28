@@ -1,24 +1,46 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
+import { Ports, MicroService } from '@/service/Constant.js';
+import axios from 'axios';
 const id = ref('');
 const password = ref('');
 const checked = ref(false);
-const router = useRouter()
+const router = useRouter();
+
+const validateLogin = async () => {
+    let data={
+        user_id: id.value
+    }
+
+    let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: MicroService['simple'] + Ports['account'] + '/users',
+        params: data
+    };
+
+    axios
+        .request(config)
+        .then((response) => {
+            console.log(response['data']['data']);
+            var result = response.data['data'];
+            console.log(666)
+            localStorage.id = id.value;
+            localStorage.acc_type=result[0].acc_type;
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+};
 
 const login = () => {
     console.log('Login clicked');
-    localStorage.id=id.value;
-    localStorage.type=type.value;
 
-    console.log(localStorage.id)
+    validateLogin();
     router.push('/');
 };
-
-
-
-
 </script>
 
 <template>

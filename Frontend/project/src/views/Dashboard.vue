@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { Ports, MicroService } from '@/service/Constant.js';
@@ -17,14 +17,14 @@ const id = ref('');
 const columns = ref([]);
 
 const notification = ref([]);
-
+let isGettingNotification = false;
+const notification_ready = ref(false);
 onMounted(() => {
     if (localStorage.id) {
         account.value = localStorage.id;
         acc_type.value = localStorage.acc_type;
 
         getCollabInfo();
-        startGetNotification();
     } else {
         router.push('/auth/login');
     }
@@ -77,18 +77,30 @@ if (localStorage.acc_type == 'cc') {
 
 const getNotification = async () => {
     try {
+        isGettingNotification = true;
         const response = await axios.get(MicroService['simple'] + Ports['notification'] + '/notification/consume', { params: { topic: account.value } });
+        notification.value = response.data['message'].reverse();
+        notification_ready.value=true;
         console.log(response.data);
         collab.value = response.data;
-        notification.value = response.data['message'];
     } catch (error) {
         console.error(error);
+    } finally {
+        isGettingNotification = false;
     }
 };
 
-const startGetNotification = () => {
-    setInterval(getNotification, 5000);
+const runGetNotification = () => {
+    if (!isGettingNotification) {
+        getNotification();
+    }
 };
+
+// Run getNotification every second
+const intervalId = setInterval(runGetNotification, 10000);
+onBeforeUnmount(() => {
+    clearInterval(intervalId);
+});
 </script>
 
 <template>
@@ -150,7 +162,7 @@ const startGetNotification = () => {
                     <h5>Notifications</h5>
                 </div>
 
-                <ul class="p-0 mx-0 mt-0 mb-4 list-none">
+                <ul class="p-0 mx-0 mt-0 mb-4 list-none" v-if="notification_ready">
                     <li v-for="message in notification" class="flex align-items-center py-2 border-bottom-1 surface-border">
                         <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
                             <i class="pi pi-dollar text-xl text-blue-500"></i>
@@ -160,8 +172,8 @@ const startGetNotification = () => {
                             <span class="text-700">{{ message.message }}</span>
                         </span>
                     </li>
-
                 </ul>
+                <ProgressSpinner v-else  style="display: flex;"/>
             </div>
         </div>
     </div>

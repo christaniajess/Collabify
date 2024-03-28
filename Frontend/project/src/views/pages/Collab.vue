@@ -63,6 +63,17 @@ const update_status = async (brand_id, status = false) => {
     }
 };
 
+const rejectCollab = async (brand_id) => {
+    try {
+        const response = await axios.delete(MicroService['simple'] + Ports['collab'] + '/collaborations', { data: { cc_id: account.value, brand_id: brand_id } });
+
+        console.log(response.data);
+        getCollabInfo();
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 const setBlacklist = async (brand_id) => {
     try {
         const response = await axios.post(MicroService['simple'] + Ports['blacklist'] + '/blacklist', { data: { account: account.value, banned_account: brand_id } });
@@ -251,7 +262,7 @@ if (localStorage.acc_type == 'cc') {
                                             severity="danger"
                                             label="Reject"
                                             @click="
-                                                update_status(slotProps.data.brand_id, 'Reject');
+                                                rejectCollab(slotProps.data.brand_id, 'Reject');
                                                 slotProps.data.visible = false;
                                             "
                                         ></Button>
@@ -260,7 +271,8 @@ if (localStorage.acc_type == 'cc') {
                                             severity="danger"
                                             label="Reject and blacklist"
                                             @click="
-                                                update_status(slotProps.data.brand_id, 'Reject');
+                                                rejectCollab(slotProps.data.brand_id, 'Reject');
+
                                                 setBlacklist(slotProps.data.brand_id);
                                                 slotProps.data.visible = false;
                                             "
