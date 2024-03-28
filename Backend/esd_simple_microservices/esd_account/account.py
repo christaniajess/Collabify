@@ -10,6 +10,8 @@ from flask import jsonify
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 CORS(app)
@@ -443,12 +445,12 @@ def get_users_by_interests(interests):
             }
         ), 500
 
-@app.route('/users/payment/', methods=['GET'])
+@app.route('/user/payment', methods=['GET'])
 def get_user_payment_info():
     user_id=request.args.get("user_id")
     print(user_id)
     try:
-        user = User.query.filter_by(user_id=user_id).first()
+        user = User.query.filter_by(user_id=str(user_id)).first()
         if user:
             return jsonify({
                 'code': 200,
