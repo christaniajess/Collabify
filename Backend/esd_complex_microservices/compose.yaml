@@ -5,8 +5,8 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      complexServer: "172.28.32.147" # original -> 172.28.110.113
-      simpleServer: "172.28.32.147" # original -> 172.28.110.113
+      complexServer: "172.28.182.145" # original -> 172.28.110.113
+      simpleServer: "172.28.182.145" # original -> 172.28.110.113
     ports:
       - 3009:5100
 
@@ -15,7 +15,7 @@ services:
       context: ./esd_complex_place_request
       dockerfile: Dockerfile
     environment:
-      simpleServer: "172.28.32.147"
+      simpleServer: "172.28.182.145"
     restart: always
     ports:
       - 3007:5100
@@ -25,7 +25,7 @@ services:
   #     context: ./esd_complex_project_management
   #     dockerfile: Dockerfile
   #   environment:
-  #     simpleServer: "172.28.32.147"
+  #     simpleServer: "172.28.182.145"
   #   restart: always
   #   ports:
   #     - 3012:5100
@@ -37,7 +37,7 @@ services:
       context: ./esd_complex_update_collab
       dockerfile: Dockerfile
     environment:
-      simpleServer: "172.28.32.147"
+      simpleServer: "172.28.182.145"
     restart: always
     ports:
       - 3011:5100
@@ -47,7 +47,7 @@ services:
       context: ./esd_complex_view_cc_profile
       dockerfile: Dockerfile
     environment:
-      simpleServer: "172.28.32.147"
+      simpleServer: "172.28.182.145"
     restart: always
     ports:
       - 3004:5100

@@ -10,7 +10,7 @@ const loaded = ref(false);
 
 const getAllCreators = async () => {
     try {
-        const response = await axios.get(MicroService['simple'] + Ports['accounts'] + '/users');
+        const response = await axios.get(MicroService['simple'] + Ports['account'] + '/users');
         console.log(response.data['data']);
         // Filter and append only "cc" user type data into account.value
         account.value = response.data['data'].filter((item) => item.acc_type === 'cc');
@@ -33,6 +33,7 @@ onMounted(() => {
                 <InputText placeholder="Keyword" />
             </InputGroup>
         </div>
+<<<<<<< HEAD
         <div class="card">
             <!-- Loop to display creators dynamically -->
             <div class="row">
@@ -52,6 +53,24 @@ onMounted(() => {
                         </Card>
                     </div>
                 </div>
+=======
+        <div class="card" style="width: 100%">
+            <!-- Loop to display creators dynamically -->
+            <div class="grid">
+                <Card v-for="(creator, index) in account" :key="index" style="width: 20rem; overflow: hidden; margin: auto; margin-bottom: 1em" class="col-4">
+                    <template #header>
+                        <img alt="user header" src="https://primefaces.org/cdn/primevue/images/usercard.png" />
+                    </template>
+                    <template #title>{{ creator.full_name }}</template>
+                    <template #subtitle>Interests</template>
+                    <template #content>
+                        <p class="m-0">
+                            {{ creator.interests }}
+                        </p>
+                    </template>
+                    
+                </Card>
+>>>>>>> 415d20d2eb8fba53d7d03d2180c9d30ade12ad62
             </div>
         </div>
     </div>

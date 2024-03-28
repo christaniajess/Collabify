@@ -16,7 +16,7 @@ app.config['SWAGGER'] = {
 }
 swagger = Swagger(app)
 
-stripe.api_key = os.environ.get('STRIPE_PRIVATE_KEY')
+stripe.api_key = "sk_test_51OuGi52KwIS1b45LvlM5Q8z0AaTmdNohKDWk3pOEKhNbvOmHJmCEU9DWbSab871Yal3Qw5H2QMXDynjOuQC6NLXB00NBUhtZne"
 
 storeItems = {
     1: {'priceInCents': 10000, 'name': 'Nike Collab'}
@@ -95,8 +95,8 @@ def create_checkout_session():
                 }
                 for item in data['items']
             ],
-            success_url=f"{os.environ.get('CLIENT_URL')}/success.html",
-            cancel_url=f"{os.environ.get('CLIENT_URL')}/cancel.html"
+            success_url=f"{os.environ.get('CLIENT_URL')}",
+            cancel_url=f"{os.environ.get('CLIENT_URL')}/Collab"
         )
         return jsonify({'url': session.url})
     except Exception as e:
