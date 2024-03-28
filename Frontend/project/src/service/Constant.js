@@ -1,6 +1,6 @@
 export const MicroService = {
-    complex: "http://localhost",
-    simple:  "http://localhost"
+    complex: "http://172.28.182.145",
+    simple:  "http://172.28.182.145"
 }
 export const Ports = {
     collab: ":3001",
