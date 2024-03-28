@@ -1,7 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
 import { Ports, MicroService } from '@/service/Constant.js';
 import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
@@ -13,19 +11,17 @@ const projectDescription = ref('');
 const projectDialog = ref(false);
 const uploadedFileName = ref('');
 const fileUploadRef = ref(null);
+const visible = ref(false);
 
 const getAllProjects = async () => {
-    // try {
-    //     const response = await axios.get(MicroService['simple'] + Ports['projects'] + '/get_project');
-    //     console.log(response.data['data']);
-    //     project.value = response.data['data'];
-    // } catch (error) {
-    //     console.error(error);
-    // }
+    try {
+        const response = await axios.get(MicroService['simple'] + Ports['project'] + '/get_all_project');
+        console.log(response.data['data']);
+        project.value = response.data['data'];
+    } catch (error) {
+        console.error(error);
+    }
 };
-
-project.value = [{ name: 1 }, { name: 2 }];
-
 const postProject = async () => {
     try {
         const response = await axios.post(MicroService['simple'] + Ports['project'] + '/create_project/' + account.value, {
@@ -47,8 +43,8 @@ const onUpload = (event) => {
     toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
 };
 const openNew = () => {
-    project.value = {};
     // submitted.value = false;
+    
     projectDialog.value = true;
 };
 const hideDialog = () => {
@@ -61,9 +57,11 @@ onMounted(() => {
 </script>
 <template>
     <div class="card">
-        <h2>Manage Projects</h2>
-        <div class="">
-            <Button label="Post" icon="pi pi-plus" class="mr-2" severity="help" @click="openNew" />
+        <div class='flex justify-content-between mx-3'> 
+            <h2>Manage Projects</h2>
+            <div class="">
+                <Button label="Post" icon="pi pi-plus" class="mr-2" severity="help" @click="openNew" />
+            </div>
         </div>
         <Dialog v-model:visible="projectDialog" :style="{ width: '450px' }" header="Product Details" :modal="true" class="p-fluid">
             <div class="field">
@@ -84,23 +82,39 @@ onMounted(() => {
             </template>
         </Dialog>
         <!-- Loop to display creators dynamically -->
-        <div class="row">
-            <div>
-                <div class="col-12" style="display: flex">
-                    <Card style="width: 21rem; overflow: hidden" v-for="(project, index) in project" :key="index">
-                        <template #header>
-                            <img alt="user header" src="https://primefaces.org/cdn/primevue/images/usercard.png" />
-                        </template>
-                        <template #title> {{ project.name }} </template>
-                        <template #subtitle>{{ project.proj_brand }}</template>
-                        <template #content>
-                            <p class="m-0">
-                                {{ project.proj_description }}
-                            </p>
-                        </template>
-                    </Card>
-                </div>
-            </div>
+        <div class="grid m-3">
+            <Card v-for="(project, index) in project" :key="index" style="width: 21rem; overflow: hidden" class="col-4 mx-5">
+                <template #header>
+                    <img alt="user header" src="https://primefaces.org/cdn/primevue/images/usercard.png" />
+                </template>
+                <template #title>{{ project.proj_name }}</template>
+                <template #subtitle>{{ project.proj_brand }}</template>
+                <template #content>
+                    <p class="m-0">
+                        {{ project.proj_description }}
+                    </p>
+                    <br />
+                    <div>
+                        <Button label="Edit" class="mb-2 mr-2" @click="visible = true" />
+                        <Dialog v-model:visible="visible" modal header="Edit Profile" :style="{ width: '25rem' }">
+                            <span class="p-text-secondary block mb-5">Update your information.</span>
+                            <div class="flex align-items-center gap-3 mb-3">
+                                <label for="username" class="font-semibold w-6rem">Username</label>
+                                <InputText id="username" class="flex-auto" autocomplete="off" />
+                            </div>
+                            <div class="flex align-items-center gap-3 mb-5">
+                                <label for="email" class="font-semibold w-6rem">Email</label>
+                                <InputText id="email" class="flex-auto" autocomplete="off" />
+                            </div>
+                            <div class="flex justify-content-end gap-2">
+                                <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
+                                <Button type="button" label="Save" @click="visible = false"></Button>
+                            </div>
+                        </Dialog>
+                        <Button label="Delete" severity="danger" class="mb-2 mr-2" />
+                    </div>
+                </template>
+            </Card>
         </div>
     </div>
 </template>

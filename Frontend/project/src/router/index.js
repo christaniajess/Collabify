@@ -142,6 +142,21 @@ const router = createRouter({
                     component: () => import('@/views/pages/Blacklist.vue')
                 },
                 {
+                    path: '/request',
+                    name: 'request',
+                    component: () => import('@/views/pages/Request.vue')
+                },
+                {
+                    path: '/chat',
+                    name: 'chat',
+                    component: () => import('@/views/pages/Chat.vue')
+                },
+                {
+                    path: '/viewprojects',
+                    name: 'viewprojects',
+                    component: () => import('@/views/pages/CCViewProjects.vue')
+                },
+                {
                     path: '/documentation',
                     name: 'documentation',
                     component: () => import('@/views/utilities/Documentation.vue')

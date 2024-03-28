@@ -7,6 +7,7 @@ services:
     environment:
       complexServer: "172.28.32.147" # original -> 172.28.110.113
       simpleServer: "172.28.32.147" # original -> 172.28.110.113
+      PYTHONUNBUFFERED: 1
     ports:
       - 3009:5100
 
@@ -16,6 +17,7 @@ services:
       dockerfile: Dockerfile
     environment:
       simpleServer: "172.28.32.147"
+      PYTHONUNBUFFERED: 1
     restart: always
     ports:
       - 3007:5100
@@ -38,6 +40,7 @@ services:
       dockerfile: Dockerfile
     environment:
       simpleServer: "172.28.32.147"
+      PYTHONUNBUFFERED: 1
     restart: always
     ports:
       - 3011:5100
@@ -48,6 +51,7 @@ services:
       dockerfile: Dockerfile
     environment:
       simpleServer: "172.28.32.147"
+      PYTHONUNBUFFERED: 1
     restart: always
     ports:
       - 3004:5100
