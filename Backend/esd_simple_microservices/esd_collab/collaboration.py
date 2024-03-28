@@ -428,6 +428,50 @@ def update_collaboration_status():
 
 
 
+# Remove Collaboration
+@app.route("/collaborations", methods=["DELETE"])
+def remove_collaboration():
+    """
+    Remove collaboration by content creator ID and brand ID
+    ---
+    parameters:
+        - in: path
+            name: cc_id
+            required: true
+            schema:
+            type: string
+        - in: path
+            name: brand_id
+            required: true
+            schema:
+            type: string
+    responses:
+        200:
+            description: Collaboration removed successfully
+        404:
+            description: Collaboration not found
+        500:
+            description: Error removing collaboration
+    """
+    cc_id = request.json["cc_id"]
+    brand_id=request.json["brand_id"]
+    
+    
+    
+    collaboration = db.session.scalars(
+        db.select(Collaboration).filter_by(cc_id=cc_id, brand_id=brand_id)).first()
+    if collaboration:
+        db.session.delete(collaboration)
+        db.session.commit()
+        return jsonify(message="Collaboration removed successfully"), 200
+    else:
+        return jsonify(message="Collaboration not found"), 404
+
+
+
+
+
+
 if __name__ == '__main__':
     print("This is flask for " + os.path.basename(__file__) + ": managing collabrations ...")
     app.run(host='0.0.0.0', port=5000, debug=True)
