@@ -122,9 +122,9 @@ const router = createRouter({
                     component: () => import('@/views/utilities/Icons.vue')
                 },
                 {
-                    path: '/pages/CCViewProjects',
+                    path: '/pages/timeline',
                     name: 'timeline',
-                    component: () => import('@/views/pages/CCViewProjects.vue')
+                    component: () => import('@/views/pages/Timeline.vue')
                 },
                 {
                     path: '/pages/empty',
@@ -140,6 +140,16 @@ const router = createRouter({
                     path: '/blacklist',
                     name: 'blacklist',
                     component: () => import('@/views/pages/Blacklist.vue')
+                },
+                {
+                    path: '/brandsearch',
+                    name: 'brandsearch',
+                    component: () => import('@/views/pages/BrandSearchCC.vue')
+                },
+                {
+                    path: '/postproject',
+                    name: 'postproject',
+                    component: () => import('@/views/pages/PostProject.vue')
                 },
                 {
                     path: '/documentation',

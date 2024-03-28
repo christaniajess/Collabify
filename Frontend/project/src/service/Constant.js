@@ -5,5 +5,7 @@ export const MicroService = {
 export const Ports = {
     collab: ":3001",
     blacklist:  ":3005",
-    accounts: ":3000",
+    account: ":3000",
+    notification:":3006"
+
 }

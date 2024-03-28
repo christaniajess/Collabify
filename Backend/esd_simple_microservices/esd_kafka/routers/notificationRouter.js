@@ -5,7 +5,7 @@ const mailgunDomain = process.env.mailgunDomain;
 const router=express.Router();
 
 
-router.post("/",(req, res) => {
+router.get("/",(req, res) => {
     res.status(200).json({
         message: "notification running!",
         test:mailgunDomain,
