@@ -196,6 +196,10 @@ def get_profile_data(details):
               "message": "Review collection failure sent for error handling."
           }
 
+    if "brand" in details:
+      collab_result["data"] = [collab for collab in collab_result["data"] if collab["data"]["collab_status"] != "on-going"]
+
+
 
     complex_results = {
                 "code": 200,

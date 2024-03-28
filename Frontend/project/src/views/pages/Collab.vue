@@ -4,23 +4,35 @@ import { ref, onMounted, onBeforeMount } from 'vue';
 import { Ports, MicroService } from '@/service/Constant.js';
 
 import axios from 'axios';
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
+var accept = false;
 const filters = ref({});
 const collab = ref([]);
+const ongoing_collab = ref([]);
+const pending_collab = ref([]);
 const loaded = ref(false);
-const account = ref('123');
+const account = ref();
 const collab_status = [
     { name: 'In-progress', code: 'In-progress' },
-    { name: 'Done', code: 'Done' }
+    { name: 'Review', code: 'Review' }
 ];
 const selectedStatus = ref();
+const columns = ref([]);
 
 const getCollabInfo = async () => {
     try {
         const response = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
         console.log(response.data['data']);
         collab.value = response.data['data'];
-        collab.value.forEach((item, index) => {
+
+        pending_collab.value = collab.value.filter((item) => item.collab_status === 'Pending');
+        pending_collab.value.forEach((item, index) => {
+            item.sn = index + 1;
+            item.edit_visible = false;
+        });
+        ongoing_collab.value = collab.value.filter((item) => item.collab_status === 'In-progress' || item.collab_status === 'Review');
+        ongoing_collab.value.forEach((item, index) => {
             item.sn = index + 1;
             item.edit_visible = false;
         });
@@ -30,13 +42,18 @@ const getCollabInfo = async () => {
     }
 };
 
-const update_status = async (brand_id) => {
+const update_status = async (brand_id, status = false) => {
     try {
-
+        var update_collab_status;
+        if (status) {
+            update_collab_status = status;
+        } else {
+            update_collab_status = selectedStatus.value;
+        }
         const response = await axios.put(MicroService['simple'] + Ports['collab'] + '/collaborations/status', {
             cc_id: account.value,
             brand_id: brand_id,
-            collab_status: selectedStatus.value.code
+            collab_status: update_collab_status
         });
 
         console.log(response.data);
@@ -46,8 +63,23 @@ const update_status = async (brand_id) => {
     }
 };
 
+const setBlacklist = async (brand_id) => {
+    try {
+        const response = await axios.post(MicroService['simple'] + Ports['blacklist'] + '/blacklist', { data: { account: account.value, banned_account: brand_id } });
+        console.log(response.data['data']);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 onBeforeMount(() => {
     initFilters();
+    if (localStorage.id) {
+        account.value = localStorage.id;
+        console.log(localStorage.acc_type == 'cc');
+    } else {
+        router.push('/auth/login');
+    }
 });
 
 onMounted(async () => {
@@ -60,46 +92,41 @@ const initFilters = () => {
     };
 };
 
-const columns = ref([
-    { field: 'sn', header: 'S/N' },
-    { field: 'cc_id', header: 'Content Creator' },
-    { field: 'collab_title', header: 'Title' },
-    { field: 'collab_status', header: 'Status' }
-]);
+if (localStorage.acc_type == 'cc') {
+    columns.value = [
+        { field: 'sn', header: 'S/N' },
+        { field: 'brand_id', header: 'Brand' },
+        { field: 'collab_title', header: 'Title' },
+        { field: 'collab_status', header: 'Status' }
+    ];
+} else {
+    columns.value = [
+        { field: 'sn', header: 'S/N' },
+        { field: 'cc_id', header: 'Content Creator' },
+        { field: 'collab_title', header: 'Title' },
+        { field: 'collab_status', header: 'Status' }
+    ];
+}
 </script>
 
 <template>
     <div class="grid">
         <div class="col-12">
             <div class="card" v-if="loaded">
-                <!-- <Toolbar class="mb-4">
-                    <template v-slot:start>
-                        <div class="my-2">
-                            <Button label="New" icon="pi pi-plus" class="mr-2" severity="success" @click="openNew" />
-                            <Button label="Delete" icon="pi pi-trash" severity="danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
-                        </div>
-                    </template>
-
-                    <template v-slot:end>
-                        <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block" />
-                        <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" />
-                    </template>
-                </Toolbar> -->
-
                 <DataTable
                     ref="dt"
-                    :value="collab"
+                    :value="ongoing_collab"
                     dataKey="id"
                     :paginator="true"
                     :rows="10"
                     :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} collabs"
                 >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">Manage Products</h5>
+                            <h5 class="m-0">On-going Collab</h5>
                             <IconField iconPosition="left" class="block mt-2 md:mt-0">
                                 <InputIcon class="pi pi-search" />
                                 <InputText class="w-full sm:w-auto" v-model="filters['global'].value" placeholder="Search..." />
@@ -107,22 +134,16 @@ const columns = ref([
                         </div>
                     </template>
 
-                    <!-- <Column selectionMode="multiple" headerStyle="width: 3rem"></Column> -->
-
                     <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
 
                     <Column headerStyle="width:14%;">
                         <template #body="slotProps">
                             <div class="flex flex-wrap gap-2">
-                                <Button label="View" v-if="slotProps.data.collab_status != 'rejected'" />
                                 <Button label="Edit" severity="warning" v-if="slotProps.data.collab_status != 'rejected'" @click="slotProps.data.edit_visible = true" />
 
                                 <Dialog v-model:visible="slotProps.data.edit_visible" modal header="Edit Collab" :style="{ width: '25rem' }">
                                     <span class="p-text-secondary block mb-5">{{ slotProps.cc_id }}</span>
-                                    <div class="flex align-items-center gap-3 mb-3">
-                                        <label for="username" class="font-semibold w-6rem">Banned Account{{ slotProps.data.cc_id }}</label>
-                                        {{ slotProps.data.banned_account }}
-                                    </div>
+
                                     <div class="flex align-items-center gap-3 mb-5">
                                         <label for="email" class="font-semibold w-6rem">Status</label>
                                         <Dropdown v-model="selectedStatus" :options="collab_status" optionLabel="name" placeholder="Select a Status" class="w-full md:w-14rem" />
@@ -140,9 +161,112 @@ const columns = ref([
                                         ></Button>
                                     </div>
                                 </Dialog>
+                            </div>
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
 
-                                <Button label="Remove" severity="danger" v-if="slotProps.data.collab_status == 'rejected'" />
-                                <Button label="Remove" severity="danger" v-if="slotProps.data.collab_status == 'In-progress'" />
+            <div class="card" v-if="loaded">
+                <DataTable
+                    ref="dt"
+                    :value="pending_collab"
+                    dataKey="id"
+                    :paginator="true"
+                    :rows="10"
+                    :filters="filters"
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    :rowsPerPageOptions="[5, 10, 25]"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} collabs"
+                >
+                    <template #header>
+                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <h5 class="m-0">Pending Collab</h5>
+                            <IconField iconPosition="left" class="block mt-2 md:mt-0">
+                                <InputIcon class="pi pi-search" />
+                                <InputText class="w-full sm:w-auto" v-model="filters['global'].value" placeholder="Search..." />
+                            </IconField>
+                        </div>
+                    </template>
+
+                    <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
+
+                    <Column headerStyle="width:14%;">
+                        <template #body="slotProps">
+                            <div class="flex flex-wrap gap-2">
+                                <Button
+                                    label="Accept"
+                                    @click="
+                                        slotProps.data.edit_visible = true;
+                                        accept = true;
+                                    "
+                                />
+                                <Button
+                                    label="Reject"
+                                    severity="danger"
+                                    @click="
+                                        slotProps.data.edit_visible = true;
+                                        accept = false;
+                                    "
+                                />
+
+                                <Dialog v-if="accept" v-model:visible="slotProps.data.edit_visible" modal header="Are you sure to accept this collab? " :style="{ width: '25rem' }">
+                                    <span class="p-text-secondary block mb-5">{{ slotProps.cc_id }}</span>
+
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <p class="font-semibold w-6rem">Brand: {{ slotProps.data.brand_id }}</p>
+                                    </div>
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <p class="font-semibold w-6rem">Title: {{ slotProps.data.collab_title }}</p>
+                                    </div>
+
+                                    <div class="flex justify-content-end gap-2">
+                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.visible = false"></Button>
+                                        <Button
+                                            type="button"
+                                            severity="danger"
+                                            label="Accept"
+                                            @click="
+                                                update_status(slotProps.data.brand_id, 'In-progress');
+                                                slotProps.data.visible = false;
+                                            "
+                                        ></Button>
+                                    </div>
+                                </Dialog>
+
+                                <Dialog v-else v-model:visible="slotProps.data.edit_visible" modal header="Are you sure to reject this collab? " :style="{ width: '25rem' }">
+                                    <span class="p-text-secondary block mb-5">{{ slotProps.cc_id }}</span>
+
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <p class="font-semibold w-6rem">Brand: {{ slotProps.data.brand_id }}</p>
+                                    </div>
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <p class="font-semibold w-6rem">Title: {{ slotProps.data.collab_title }}</p>
+                                    </div>
+
+                                    <div class="flex justify-content-end gap-2">
+                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.visible = false"></Button>
+                                        <Button
+                                            type="button"
+                                            severity="danger"
+                                            label="Reject"
+                                            @click="
+                                                update_status(slotProps.data.brand_id, 'Reject');
+                                                slotProps.data.visible = false;
+                                            "
+                                        ></Button>
+                                        <Button
+                                            type="button"
+                                            severity="danger"
+                                            label="Reject and blacklist"
+                                            @click="
+                                                update_status(slotProps.data.brand_id, 'Reject');
+                                                setBlacklist(slotProps.data.brand_id);
+                                                slotProps.data.visible = false;
+                                            "
+                                        ></Button>
+                                    </div>
+                                </Dialog>
                             </div>
                         </template>
                     </Column>
