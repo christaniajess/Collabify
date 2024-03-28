@@ -3,11 +3,14 @@ import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount } from 'vue';
 import { Ports, MicroService } from '@/service/Constant.js';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
+
+const router = useRouter();
 const filters = ref({});
 const blacklist = ref([]);
 const loaded = ref(false);
-const account = ref('123');
+const account = ref();
 
 const getblacklistInfo = async () => {
     let data = {
@@ -56,6 +59,11 @@ const remove_blacklist = async (banned_account) => {
 
 onBeforeMount(async () => {
     initFilters();
+    if (localStorage.id) {
+        account.value = localStorage.id;
+    } else {
+        router.push('/auth/login');
+    }
 });
 
 onMounted(async () => {
@@ -104,8 +112,8 @@ const columns = ref([
                     <Column headerStyle="width:14%;">
                         <template #body="slotProps">
                             <div class="flex flex-wrap gap-2">
-                                <Button label="Edit" severity="warning" @click="slotProps.data.visible = true" />
-                                <Dialog v-model:visible="slotProps.data.visible" modal header="Remove Blacklist" :style="{ width: '25rem' }">
+                                <Button label="Remove" severity="danger" @click="slotProps.data.visible = true" />
+                                <Dialog v-model:visible="slotProps.data.visible" modal header="Are you sure to remove this user from blacklist?" :style="{ width: '25rem' }">
                                     <span class="p-text-secondary block mb-5">{{ slotProps.cc_id }}</span>
                                     <div class="flex align-items-center gap-3 mb-3">
                                         <label for="username" class="font-semibold w-6rem">Banned Account{{ slotProps.data.cc_id }}</label>

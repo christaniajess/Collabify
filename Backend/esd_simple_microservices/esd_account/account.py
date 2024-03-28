@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 import os
 from flask_cors import CORS
+from flask import jsonify
 
 
 app = Flask(__name__)
@@ -30,6 +31,7 @@ class User(db.Model):
     password = db.Column(db.Text)
     user_photo = db.Column(db.Text)
     interests = db.Column(db.Text)
+    stripe_key = db.Column(db.Text)
 
 # Function to get all users and their details
 @app.route('/users', methods=['GET'])
@@ -82,7 +84,7 @@ def list_users():
                 'full_name': user.full_name,
                 'email': user.email,
                 'user_photo': user.user_photo,
-                'interests': user.interests
+                'interests': user.interests,
             }
             user_list.append(user_data)
         return jsonify(
@@ -290,7 +292,7 @@ def delete_user(user_id):
         ), 404
 
 # Function to get user details by user_id
-@app.route('/users/<int:user_id>', methods=['GET'])
+@app.route('/users', methods=['GET'])
 def get_user(user_id):
     """
     Get a single user's details
@@ -335,8 +337,9 @@ def get_user(user_id):
             description: User not found
     """
     print('FINDING USER!')
+    user_id=request.args.get("user_id")
     try:
-        user = User.query.get_or_404(user_id)
+        user = User.query.get_or_404(user_id).first()
         user_data = {
             'user_id': user.user_id,
             'username': user.username,
@@ -439,6 +442,37 @@ def get_users_by_interests(interests):
                 'message': f'Internal Server Error: {str(e)}'
             }
         ), 500
+
+@app.route('/users/payment/', methods=['GET'])
+def get_user_payment_info():
+    user_id=request.args.get("user_id")
+    print(user_id)
+    try:
+        user = User.query.filter_by(user_id=user_id).first()
+        if user:
+            return jsonify({
+                'code': 200,
+                'data': {
+                    'user_id': user.user_id,
+                    'stripe_key': user.stripe_key
+                }
+            }), 200
+        else:
+            return jsonify({
+                'code': 404,
+                'message': 'User not found'
+            }), 404
+            
+    except Exception as e:
+        return jsonify(
+            {
+                'code': 500,
+                'message': f'Internal Server Error: {str(e)}'
+            }
+        ), 500
+
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
