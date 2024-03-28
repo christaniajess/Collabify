@@ -152,6 +152,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/CCViewProjects.vue')
                 },
                 {
+                    path: '/payment',
+                    name: 'payment',
+                    component: () => import('@/views/pages/Payment.vue')
+                },
+                {
                     path: '/documentation',
                     name: 'documentation',
                     component: () => import('@/views/utilities/Documentation.vue')

@@ -14,7 +14,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/account
+      dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/account
 
     ports:
       - 3000:5000
@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/blacklist
+      dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/blacklist
     ports:
       - 3005:5000
 
@@ -41,7 +41,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/collaboration
+      dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/collaboration
     ports:
       - 3001:5000
   
@@ -100,8 +100,8 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      STRIPE_PRIVATE_KEY: sk_test_51OuGi52KwIS1b45LvlM5Q8z0AaTmdNohKDWk3pOEKhNbvOmHJmCEU9DWbSab871Yal3Qw5H2QMXDynjOuQC6NLXB00NBUhtZne
-      CLIENT_URL: "123"
+      STRIPE_PRIVATE_KEY: "sk_test_51OuGi52KwIS1b45LvlM5Q8z0AaTmdNohKDWk3pOEKhNbvOmHJmCEU9DWbSab871Yal3Qw5H2QMXDynjOuQC6NLXB00NBUhtZne"
+      CLIENT_URL: "http://localhost:5173"
     ports:
       - 3010:5000
 
@@ -115,7 +115,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/project
+      dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/project
     ports:
       - 3003:5000
   #################################
@@ -126,7 +126,7 @@ services:
       context: ./esd_recommend
       dockerfile: Dockerfile
     environment:
-      simpleServer: "172.28.32.147" #original -> 172.28.110.113
+      simpleServer: "172.28.182.145" #original -> 172.28.110.113
     restart: always
     ports:
       - 3008:5000
@@ -140,6 +140,6 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/review
+      dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/review
     ports:
       - 3002:5000
