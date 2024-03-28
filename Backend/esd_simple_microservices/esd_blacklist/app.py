@@ -7,8 +7,9 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
-CORS(app)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+CORS(app)
+
 db = SQLAlchemy(app)
 
 app.config['SWAGGER'] = {
@@ -177,7 +178,7 @@ def create_blacklist():
         500:
             description: Internal server error occurred while creating the blacklist record.
     """
-    data = request.get_json()
+    data = request.get_json()["data"]
     account = data['account']
     banned_account = data['banned_account']
     
