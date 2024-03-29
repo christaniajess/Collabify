@@ -147,11 +147,6 @@ const router = createRouter({
                     component: () => import('@/views/pages/BrandSearchCC.vue')
                 },
                 {
-<<<<<<< HEAD
-                    path: '/postproject',
-                    name: 'postproject',
-                    component: () => import('@/views/pages/PostProject.vue')
-=======
                     path: '/viewprojects',
                     name: 'viewprojects',
                     component: () => import('@/views/pages/CCViewProjects.vue')
@@ -160,7 +155,6 @@ const router = createRouter({
                     path: '/payment',
                     name: 'payment',
                     component: () => import('@/views/pages/Payment.vue')
->>>>>>> 415d20d2eb8fba53d7d03d2180c9d30ade12ad62
                 },
                 {
                     path: '/documentation',

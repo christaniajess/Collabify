@@ -9,20 +9,23 @@ from invokes import invoke_http
 app = Flask(__name__)
 CORS(app)
 
-app.config['SWAGGER'] = {
-    'title': 'View Profile Complex Microservice API',
-    'version': '1.0',
-    'openapi': '3.0.2',
-    'description': 'View content creator profiles'
+app.config["SWAGGER"] = {
+    "title": "View Profile Complex Microservice API",
+    "version": "1.0",
+    "openapi": "3.0.2",
+    "description": "View content creator profiles",
 }
 swagger = Swagger(app)
 
-ACCOUNT_URL = "http://"+os.environ.get("simpleServer")+":3000"
-COLLAB_URL = "http://"+os.environ.get("simpleServer")+":3001/collaborations"
+# ACCOUNT_URL = "http://"+os.environ.get("simpleServer")+":3000"
+# COLLAB_URL = "http://"+os.environ.get("simpleServer")+":3001/collaborations"
+ACCOUNT_URL = "http://" + "localhost" + ":3000"
+COLLAB_URL = "http://" + "localhost" + ":3001/collaborations"
+PAYMENT_URL = "http://" + "localhost" + ":5000/checkout-session"
+# http://localhost:5000/checkout-session
 
 
-
-@app.route("/profile", methods=['POST'])
+@app.route("/close_collab", methods=["POST"])
 def close_collab():
     """
     Get a Comprehensive Profile View
@@ -83,7 +86,9 @@ def close_collab():
     if request.is_json:
         try:
             details = request.get_json()
-            print("\nReceived a profile in JSON:", details) # Details provided is the id of the requested user in json format
+            print(
+                "\nReceived a profile in JSON:", details
+            )  # Details provided is the id of the requested user in json format
 
             # Get all the relevant details of the user
             result = get_profile_data(details)
@@ -93,27 +98,44 @@ def close_collab():
             # Unexpected error in code
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            ex_str = str(e) + " at " + str(exc_type) + ": " + fname + ": line " + str(exc_tb.tb_lineno)
+            ex_str = (
+                str(e)
+                + " at "
+                + str(exc_type)
+                + ": "
+                + fname
+                + ": line "
+                + str(exc_tb.tb_lineno)
+            )
             print(ex_str)
 
-            return jsonify({
-                "code": 500,
-                "message": "complex_viewProfile.py internal error: " + ex_str
-            }), 500
+            return (
+                jsonify(
+                    {
+                        "code": 500,
+                        "message": "complex_viewProfile.py internal error: " + ex_str,
+                    }
+                ),
+                500,
+            )
 
     # if reached here, not a JSON request.
-    return jsonify({
-        "code": 400,
-        "message": "Invalid JSON input: " + str(request.get_data())
-    }), 400
+    return (
+        jsonify(
+            {"code": 400, "message": "Invalid JSON input: " + str(request.get_data())}
+        ),
+        400,
+    )
 
 
 def get_profile_data(details):
     # Collect Account details
     # Invoke Account Microservice
-    print('\n-----Invoking account microservice-----')
-    account_result = invoke_http(ACCOUNT_URL+"/user/payment?user_id="+str(details['cc_id']), method='GET')
-    print('account_result:', account_result)
+    print("\n-----Invoking account microservice-----")
+    account_result = invoke_http(
+        ACCOUNT_URL + "/user/payment?user_id=" + str(details["cc_id"]), method="GET"
+    )
+    print("account_result:", account_result)
 
     code = account_result["code"]
     if code not in range(200, 300):
@@ -124,27 +146,50 @@ def get_profile_data(details):
                 "data": {"message": "Account not found for the specified user ID."},
             }
         else:
-          return {
-              "code": 500,
-              "data": {"account_result": account_result},
-          }
-    
+            return {
+                "code": 500,
+                "data": {"account_result": account_result},
+            }
 
-    stripe_key=account_result['data']['stripe_key']
+    stripe_key = account_result["data"]["stripe_key"]
     # Collect Payment details
     # Invoke Payment Microservice
-    print('\n-----Invoking payment microservice-----')
-    
+    print("\n-----Invoking payment microservice-----")
+
+    payment_result = invoke_http(
+        PAYMENT_URL,
+        method="POST",
+        json={
+            "items": [
+                {
+                    "collab_title": details["collab_title"],
+                    "amount": details["amount"],
+                    "quantity": 1,
+                }
+            ],
+            "stripe_key": stripe_key,
+        },
+    )
+
+    print("paymentResult:", payment_result)
+
+    code = account_result["code"]
+    if code not in range(200, 300):
+
+        return {
+            "code": 500,
+            "data": {"payment_result": payment_result},
+        }
 
     return {
-      "code": 200,
-      'stripe_key': account_result['data']['stripe_key'],
+        "code": 200,
+        "payment_result": payment_result,
     }
+
 
 # Execute this program if it is run as a main script (not by 'import')
 if __name__ == "__main__":
-    print("This is flask " + os.path.basename(__file__) +
-          " for placing an order...")
+    print("This is flask " + os.path.basename(__file__) + " for placing an order...")
     app.run(host="0.0.0.0", port=5100, debug=True)
     # Notes for the parameters:
     # - debug=True will reload the program automatically if a change is detected;

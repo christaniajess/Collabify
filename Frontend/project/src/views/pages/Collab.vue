@@ -49,7 +49,7 @@ const update_status = async (brand_id, status = false) => {
         if (status) {
             update_collab_status = status;
         } else {
-            update_collab_status = selectedStatus.value;
+            update_collab_status = selectedStatus.value['name'];
         }
         const response = await axios.put(MicroService['simple'] + Ports['collab'] + '/collaborations/status', {
             cc_id: account.value,
@@ -84,12 +84,13 @@ const setBlacklist = async (brand_id) => {
     }
 };
 
-const payment = async (brand_id) => {
+const payment = async (brand_id, collab_title) => {
     try {
-        const response = await axios.put(MicroService['simple'] + Ports['payment'] + '/collaborations/status', {
+        const response = await axios.post(MicroService['simple'] + Ports['payment'] + '/close_collab', {
             cc_id: account.value,
             brand_id: brand_id,
-            collab_status: 'Paid'
+            collab_title: collab_title,
+            amount: 10000
         });
 
         console.log(response.data);
@@ -215,7 +216,8 @@ const initFilters = () => {
                                             severity="danger"
                                             label="Pay"
                                             @click="
-                                                payment(slotProps.data.brand_id);
+                                                console.log(666666666);
+                                                payment(slotProps.data.brand_id, slotProps.data.collab_title);
                                                 slotProps.data.edit_visible = false;
                                             "
                                         ></Button>

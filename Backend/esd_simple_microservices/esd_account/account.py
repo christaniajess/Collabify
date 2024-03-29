@@ -9,8 +9,10 @@ from flask import jsonify
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://root@localhost:3306/account"
 
+      
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -36,7 +38,7 @@ class User(db.Model):
     stripe_key = db.Column(db.Text)
 
 # Function to get all users and their details
-@app.route('/users', methods=['GET'])
+@app.route('/all_users', methods=['GET'])
 def list_users():
     """
     List all users
@@ -295,7 +297,7 @@ def delete_user(user_id):
 
 # Function to get user details by user_id
 @app.route('/users', methods=['GET'])
-def get_user(user_id):
+def get_user():
     """
     Get a single user's details
     ---
@@ -341,7 +343,7 @@ def get_user(user_id):
     print('FINDING USER!')
     user_id=request.args.get("user_id")
     try:
-        user = User.query.get_or_404(user_id).first()
+        user = User.query.get_or_404(user_id)
         user_data = {
             'user_id': user.user_id,
             'username': user.username,
