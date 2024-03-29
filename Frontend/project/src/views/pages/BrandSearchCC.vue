@@ -33,6 +33,27 @@ onMounted(() => {
                 <InputText placeholder="Keyword" />
             </InputGroup>
         </div>
+<<<<<<< HEAD
+        <div class="card">
+            <!-- Loop to display creators dynamically -->
+            <div class="row">
+                <div v-for="(creator, index) in account" :key="index">
+                    <div class="col-12">
+                        <Card style="width: 21rem; overflow: hidden">
+                            <template #header>
+                                <img alt="user header" src="https://primefaces.org/cdn/primevue/images/usercard.png" />
+                            </template>
+                            <template #title>{{ creator.full_name }}</template>
+                            <template #subtitle>Interests</template>
+                            <template #content>
+                                <p class="m-0">
+                                    {{ creator.interests }}
+                                </p>
+                            </template>
+                        </Card>
+                    </div>
+                </div>
+=======
         <div class="card" style="width: 100%">
             <!-- Loop to display creators dynamically -->
             <div class="grid">
@@ -49,6 +70,7 @@ onMounted(() => {
                     </template>
                     
                 </Card>
+>>>>>>> 415d20d2eb8fba53d7d03d2180c9d30ade12ad62
             </div>
         </div>
     </div>

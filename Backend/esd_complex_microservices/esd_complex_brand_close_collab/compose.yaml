@@ -1,0 +1,10 @@
+services:
+  complex_brand_close_collab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      simpleServer: "172.28.110.113"
+    ports:
+      - 3013:5100
