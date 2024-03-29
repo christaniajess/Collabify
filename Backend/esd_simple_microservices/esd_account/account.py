@@ -9,8 +9,8 @@ from flask import jsonify
 
 
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://root@localhost:3306/account"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
+# app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://root@localhost:3306/account"
 
       
 
