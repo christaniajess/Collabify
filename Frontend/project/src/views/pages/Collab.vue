@@ -11,20 +11,27 @@ const filters = ref({});
 const collab = ref([]);
 const ongoing_collab = ref([]);
 const pending_collab = ref([]);
+const completed_collab = ref([]);
+
 const loaded = ref(false);
 const account = ref();
+const account_type = ref();
 const collab_status = [
     { name: 'In-progress', code: 'In-progress' },
     { name: 'Review', code: 'Review' }
 ];
 const selectedStatus = ref();
 const columns = ref([]);
-
+const response = ref();
 const getCollabInfo = async () => {
     try {
-        const response = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
-        console.log(response.data['data']);
-        collab.value = response.data['data'];
+        if (account_type.value == 'cc') {
+            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
+        } else {
+            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/brand/' + account.value);
+        }
+        console.log(response.value.data['data']);
+        collab.value = response.value.data['data'];
 
         pending_collab.value = collab.value.filter((item) => item.collab_status === 'Pending');
         pending_collab.value.forEach((item, index) => {
@@ -36,8 +43,16 @@ const getCollabInfo = async () => {
             item.sn = index + 1;
             item.edit_visible = false;
         });
+
+        completed_collab.value = collab.value.filter((item) => item.collab_status === 'Completed');
+        completed_collab.value.forEach((item, index) => {
+            item.sn = index + 1;
+            item.edit_visible = false;
+        });
+
         loaded.value = true;
     } catch (error) {
+        //if 404 do something 
         console.error(error);
     }
 };
@@ -48,13 +63,16 @@ const update_status = async (brand_id, status = false) => {
         if (status) {
             update_collab_status = status;
         } else {
-            update_collab_status = selectedStatus.value;
+            update_collab_status = selectedStatus.value['name'];
         }
-        const response = await axios.put(MicroService['simple'] + Ports['collab'] + '/collaborations/status', {
+        let data = {
             cc_id: account.value,
             brand_id: brand_id,
             collab_status: update_collab_status
-        });
+        };
+
+        console.log(data);
+        const response = await axios.put(MicroService['complex'] + Ports['complex_update_collab'] + '/update_request', data);
 
         console.log(response.data);
         getCollabInfo();
@@ -83,11 +101,33 @@ const setBlacklist = async (brand_id) => {
     }
 };
 
+const payment = async (brand_id, collab_title, pay_amount) => {
+    try {
+        const response = await axios.post(MicroService['simple'] + Ports['payment'] + '/close_collab', {
+            cc_id: brand_id,
+            brand_id: account.value,
+            collab_title: collab_title,
+            amount: pay_amount
+        });
+
+        console.log(response.data);
+        // Redirect to the URL from the response
+        if (response.data['payment_url']) {
+            window.location.href = response.data['payment_url'];
+        }
+
+        // getCollabInfo();
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 onBeforeMount(() => {
     initFilters();
     if (localStorage.id) {
         account.value = localStorage.id;
-        console.log(localStorage.acc_type == 'cc');
+        account_type.value = localStorage.acc_type;
+        console.log(account_type.value == 'cc');
     } else {
         router.push('/auth/login');
     }
@@ -95,6 +135,21 @@ onBeforeMount(() => {
 
 onMounted(async () => {
     await getCollabInfo();
+    if (account_type.value == 'cc') {
+        columns.value = [
+            { field: 'sn', header: 'S/N' },
+            { field: 'brand_id', header: 'Brand' },
+            { field: 'collab_title', header: 'Title' },
+            { field: 'collab_status', header: 'Status' }
+        ];
+    } else {
+        columns.value = [
+            { field: 'sn', header: 'S/N' },
+            { field: 'cc_id', header: 'Content Creator' },
+            { field: 'collab_title', header: 'Title' },
+            { field: 'collab_status', header: 'Status' }
+        ];
+    }
 });
 
 const initFilters = () => {
@@ -102,22 +157,6 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
-
-if (localStorage.acc_type == 'cc') {
-    columns.value = [
-        { field: 'sn', header: 'S/N' },
-        { field: 'brand_id', header: 'Brand' },
-        { field: 'collab_title', header: 'Title' },
-        { field: 'collab_status', header: 'Status' }
-    ];
-} else {
-    columns.value = [
-        { field: 'sn', header: 'S/N' },
-        { field: 'cc_id', header: 'Content Creator' },
-        { field: 'collab_title', header: 'Title' },
-        { field: 'collab_status', header: 'Status' }
-    ];
-}
 </script>
 
 <template>
@@ -147,11 +186,10 @@ if (localStorage.acc_type == 'cc') {
 
                     <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
 
-                    <Column headerStyle="width:14%;">
+                    <Column headerStyle="width:14%;" v-if="account_type == 'cc'">
                         <template #body="slotProps">
                             <div class="flex flex-wrap gap-2">
-                                <Button label="Edit" severity="warning" v-if="slotProps.data.collab_status != 'rejected'" @click="slotProps.data.edit_visible = true" />
-
+                                <Button label="Edit" severity="warning" @click="slotProps.data.edit_visible = true" />
                                 <Dialog v-model:visible="slotProps.data.edit_visible" modal header="Edit Collab" :style="{ width: '25rem' }">
                                     <span class="p-text-secondary block mb-5">{{ slotProps.cc_id }}</span>
 
@@ -160,14 +198,54 @@ if (localStorage.acc_type == 'cc') {
                                         <Dropdown v-model="selectedStatus" :options="collab_status" optionLabel="name" placeholder="Select a Status" class="w-full md:w-14rem" />
                                     </div>
                                     <div class="flex justify-content-end gap-2">
-                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.visible = false"></Button>
+                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.edit_visible = false"></Button>
                                         <Button
                                             type="button"
                                             severity="danger"
                                             label="Update"
                                             @click="
                                                 update_status(slotProps.data.brand_id);
-                                                slotProps.data.visible = false;
+                                                slotProps.data.edit_visible = false;
+                                            "
+                                        ></Button>
+                                    </div>
+                                </Dialog>
+                            </div>
+                        </template>
+                    </Column>
+
+                    <Column headerStyle="width:14%;" v-if="account_type == 'brand'">
+                        <template #body="slotProps">
+                            <div class="flex flex-wrap gap-2">
+                                <Button label="Pay" severity="warning" v-if="slotProps.data.collab_status == 'Review'" @click="slotProps.data.edit_visible = true" />
+
+                                <Dialog v-model:visible="slotProps.data.edit_visible" modal header="Pay" :style="{ width: '25rem' }">
+                                    <span class="p-text-secondary block mb-5">{{ slotProps.cc_id }}</span>
+
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <label for="email" class="font-semibold w-6rem">Content Creator</label>
+                                        {{ slotProps.data.cc_id }}
+                                    </div>
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <label for="email" class="font-semibold w-6rem">Collab title</label>
+                                        {{ slotProps.data.collab_title }}
+                                    </div>
+
+                                    <div class="flex align-items-center gap-3 mb-5"></div>
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <label for="amount" class="font-semibold w-6rem">Amount ($)</label>
+                                        <InputText id="amount" v-model="slotProps.data.amount" type="number" placeholder="Enter amount" />
+                                    </div>
+
+                                    <div class="flex justify-content-end gap-2">
+                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.edit_visible = false"></Button>
+                                        <Button
+                                            type="button"
+                                            severity="danger"
+                                            label="Pay"
+                                            @click="
+                                                console.log(666666666);
+                                                payment(slotProps.data.cc_id, slotProps.data.collab_title, slotProps.data.amount * 100);
                                             "
                                         ></Button>
                                     </div>
@@ -202,7 +280,7 @@ if (localStorage.acc_type == 'cc') {
 
                     <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
 
-                    <Column headerStyle="width:14%;">
+                    <Column headerStyle="width:14%;" v-if="account_type == 'cc'">
                         <template #body="slotProps">
                             <div class="flex flex-wrap gap-2">
                                 <Button
@@ -232,14 +310,14 @@ if (localStorage.acc_type == 'cc') {
                                     </div>
 
                                     <div class="flex justify-content-end gap-2">
-                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.visible = false"></Button>
+                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.edit_visible = false"></Button>
                                         <Button
                                             type="button"
                                             severity="danger"
                                             label="Accept"
                                             @click="
                                                 update_status(slotProps.data.brand_id, 'In-progress');
-                                                slotProps.data.visible = false;
+                                                slotProps.data.edit_visible = false;
                                             "
                                         ></Button>
                                     </div>
@@ -256,14 +334,14 @@ if (localStorage.acc_type == 'cc') {
                                     </div>
 
                                     <div class="flex justify-content-end gap-2">
-                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.visible = false"></Button>
+                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.edit_visible = false"></Button>
                                         <Button
                                             type="button"
                                             severity="danger"
                                             label="Reject"
                                             @click="
                                                 rejectCollab(slotProps.data.brand_id, 'Reject');
-                                                slotProps.data.visible = false;
+                                                slotProps.data.edit_visible = false;
                                             "
                                         ></Button>
                                         <Button
@@ -274,7 +352,7 @@ if (localStorage.acc_type == 'cc') {
                                                 rejectCollab(slotProps.data.brand_id, 'Reject');
 
                                                 setBlacklist(slotProps.data.brand_id);
-                                                slotProps.data.visible = false;
+                                                slotProps.data.edit_visible = false;
                                             "
                                         ></Button>
                                     </div>
@@ -282,6 +360,32 @@ if (localStorage.acc_type == 'cc') {
                             </div>
                         </template>
                     </Column>
+                </DataTable>
+            </div>
+
+            <div class="card" v-if="loaded">
+                <DataTable
+                    ref="dt"
+                    :value="completed_collab"
+                    dataKey="id"
+                    :paginator="true"
+                    :rows="10"
+                    :filters="filters"
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    :rowsPerPageOptions="[5, 10, 25]"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} collabs"
+                >
+                    <template #header>
+                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <h5 class="m-0">Completed Collab</h5>
+                            <IconField iconPosition="left" class="block mt-2 md:mt-0">
+                                <InputIcon class="pi pi-search" />
+                                <InputText class="w-full sm:w-auto" v-model="filters['global'].value" placeholder="Search..." />
+                            </IconField>
+                        </div>
+                    </template>
+
+                    <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
                 </DataTable>
             </div>
         </div>

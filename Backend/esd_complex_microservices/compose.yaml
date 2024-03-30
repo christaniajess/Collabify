@@ -27,7 +27,7 @@ services:
   #     context: ./esd_complex_project_management
   #     dockerfile: Dockerfile
   #   environment:
-  #     simpleServer: "172.28.32.147"
+  #     simpleServer: "172.28.182.145"
   #   restart: always
   #   ports:
   #     - 3012:5100

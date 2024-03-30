@@ -20,7 +20,9 @@ blacklist_URL = "http://"+os.environ.get("simpleServer")+":3005/blacklist"
 notification_URL = "http://"+os.environ.get("simpleServer")+":3006"
 collab_URL = "http://"+os.environ.get("simpleServer")+":3001/collaborations"
 
-
+# blacklist_URL = "http://localhost:3005/blacklist"
+# notification_URL = "http://localhost:3006"
+# collab_URL = "http://localhost:3001/collaborations"
 @app.route("/update_request", methods=['PUT'])
 def accept_request():
     """
@@ -100,13 +102,22 @@ def processUpdateRequest(collab):
     else:
         
         print('\n\n-----Invoking notification microservice-----')
-        data={
-            "sender": collab_result["data"]["cc_id"],
-            "message": "Collaboration updated!\ncontent creator: "+collab_result["data"]["cc_id"]+"\ncollab title: "+collab_result["data"]["collab_title"]+"\ncollab_status: "+collab_result["data"]["collab_status"],
-            "receiver":collab_result["data"]["brand_id"]
-        }
+        if (collab_result["data"]["collab_status"]=="Completed"):
+            data={
+                "sender": collab_result["data"]["brand_id"],
+                "message": "Collaboration updated!\nBrand: "+collab_result["data"]["brand_id"]+"\nCollab title: "+collab_result["data"]["collab_title"]+"\nCollab_status: "+collab_result["data"]["collab_status"],
+                "receiver":collab_result["data"]["cc_id"]
+            }
+            invoke_http(notification_URL+"/notification/publish", method="POST", json=data)
+            
+        elif (collab_result["data"]["collab_status"]=="Review"):
+            data={
+                "sender": collab_result["data"]["cc_id"],
+                "message": "Collaboration updated!\nContent creator: "+collab_result["data"]["cc_id"]+"\nCollab title: "+collab_result["data"]["collab_title"]+"\nCollab_status: "+collab_result["data"]["collab_status"],
+                "receiver":collab_result["data"]["brand_id"]
+            }
 
-        invoke_http(notification_URL+"/notification/publish", method="POST", json=data)
+            invoke_http(notification_URL+"/notification/publish", method="POST", json=data)
         
         
 
