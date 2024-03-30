@@ -11,6 +11,8 @@ const filters = ref({});
 const collab = ref([]);
 const ongoing_collab = ref([]);
 const pending_collab = ref([]);
+const completed_collab = ref([]);
+
 const loaded = ref(false);
 const account = ref();
 const account_type = ref();
@@ -20,12 +22,16 @@ const collab_status = [
 ];
 const selectedStatus = ref();
 const columns = ref([]);
-
+const response = ref();
 const getCollabInfo = async () => {
     try {
-        const response = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
-        console.log(response.data['data']);
-        collab.value = response.data['data'];
+        if (account_type.value == 'cc') {
+            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
+        } else {
+            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/brand/' + account.value);
+        }
+        console.log(response.value.data['data']);
+        collab.value = response.value.data['data'];
 
         pending_collab.value = collab.value.filter((item) => item.collab_status === 'Pending');
         pending_collab.value.forEach((item, index) => {
@@ -37,6 +43,13 @@ const getCollabInfo = async () => {
             item.sn = index + 1;
             item.edit_visible = false;
         });
+
+        completed_collab.value = collab.value.filter((item) => item.collab_status === 'Completed');
+        completed_collab.value.forEach((item, index) => {
+            item.sn = index + 1;
+            item.edit_visible = false;
+        });
+
         loaded.value = true;
     } catch (error) {
         console.error(error);
@@ -51,11 +64,14 @@ const update_status = async (brand_id, status = false) => {
         } else {
             update_collab_status = selectedStatus.value['name'];
         }
-        const response = await axios.put(MicroService['simple'] + Ports['collab'] + '/collaborations/status', {
+        let data = {
             cc_id: account.value,
             brand_id: brand_id,
             collab_status: update_collab_status
-        });
+        };
+
+        console.log(data);
+        const response = await axios.put(MicroService['complex'] + Ports['complex_update_collab'] + '/update_request', data);
 
         console.log(response.data);
         getCollabInfo();
@@ -84,17 +100,22 @@ const setBlacklist = async (brand_id) => {
     }
 };
 
-const payment = async (brand_id, collab_title) => {
+const payment = async (brand_id, collab_title, pay_amount) => {
     try {
         const response = await axios.post(MicroService['simple'] + Ports['payment'] + '/close_collab', {
-            cc_id: account.value,
-            brand_id: brand_id,
+            cc_id: brand_id,
+            brand_id: account.value,
             collab_title: collab_title,
-            amount: 10000
+            amount: pay_amount
         });
 
         console.log(response.data);
-        getCollabInfo();
+        // Redirect to the URL from the response
+        if (response.data['payment_url']) {
+            window.location.href = response.data['payment_url'];
+        }
+
+        // getCollabInfo();
     } catch (error) {
         console.error(error);
     }
@@ -209,6 +230,12 @@ const initFilters = () => {
                                         {{ slotProps.data.collab_title }}
                                     </div>
 
+                                    <div class="flex align-items-center gap-3 mb-5"></div>
+                                    <div class="flex align-items-center gap-3 mb-5">
+                                        <label for="amount" class="font-semibold w-6rem">Amount ($)</label>
+                                        <InputText id="amount" v-model="slotProps.data.amount" type="number" placeholder="Enter amount" />
+                                    </div>
+
                                     <div class="flex justify-content-end gap-2">
                                         <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.edit_visible = false"></Button>
                                         <Button
@@ -217,8 +244,7 @@ const initFilters = () => {
                                             label="Pay"
                                             @click="
                                                 console.log(666666666);
-                                                payment(slotProps.data.brand_id, slotProps.data.collab_title);
-                                                slotProps.data.edit_visible = false;
+                                                payment(slotProps.data.cc_id, slotProps.data.collab_title, slotProps.data.amount * 100);
                                             "
                                         ></Button>
                                     </div>
@@ -253,7 +279,7 @@ const initFilters = () => {
 
                     <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
 
-                    <Column headerStyle="width:14%;">
+                    <Column headerStyle="width:14%;" v-if="account_type == 'cc'">
                         <template #body="slotProps">
                             <div class="flex flex-wrap gap-2">
                                 <Button
@@ -333,6 +359,32 @@ const initFilters = () => {
                             </div>
                         </template>
                     </Column>
+                </DataTable>
+            </div>
+
+            <div class="card" v-if="loaded">
+                <DataTable
+                    ref="dt"
+                    :value="completed_collab"
+                    dataKey="id"
+                    :paginator="true"
+                    :rows="10"
+                    :filters="filters"
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    :rowsPerPageOptions="[5, 10, 25]"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} collabs"
+                >
+                    <template #header>
+                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <h5 class="m-0">Completed Collab</h5>
+                            <IconField iconPosition="left" class="block mt-2 md:mt-0">
+                                <InputIcon class="pi pi-search" />
+                                <InputText class="w-full sm:w-auto" v-model="filters['global'].value" placeholder="Search..." />
+                            </IconField>
+                        </div>
+                    </template>
+
+                    <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true" headerStyle="width:14%; min-width:10rem;"></Column>
                 </DataTable>
             </div>
         </div>

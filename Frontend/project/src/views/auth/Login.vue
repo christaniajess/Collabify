@@ -28,7 +28,7 @@ const validateLogin = async () => {
             var result = response.data['data'];
             console.log(666)
             localStorage.id = id.value;
-            localStorage.acc_type=result[0].acc_type;
+            localStorage.acc_type=result.acc_type;
         })
         .catch((error) => {
             console.log(error);

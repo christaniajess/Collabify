@@ -1,37 +1,47 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
-const paymentProcess = (collab, amount) => {
-    fetch('http://localhost:5000/checkout-session', {
-        method: 'POST',
+import { Ports, MicroService } from '@/service/Constant.js';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const brand_id = ref();
+const cc_id = ref();
+
+const paymentProcess = () => {
+    fetch(MicroService['complex'] + Ports['complex_update_collab'] + '/update_request', {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            items: [
-                {
-                    collab_title: collab,
-                    amount: amount,
-                    quantity: 1
-                }
-            ]
+            brand_id: brand_id.value,
+            cc_id: cc_id.value,
+            collab_status: 'Completed'
         })
     })
         .then((res) => {
             if (res.ok) return res.json();
             return res.json().then((json) => Promise.reject(json));
         })
-        .then(({ url }) => {
+        .then(() => {
             // console.log(url)
-            window.location = url;
+            router.push('/Collab');
         })
         .catch((e) => {
             console.error(e.error);
         });
 };
 
+let urlParams = ref(null);
 
-
+onMounted(async () => {
+    const url = new URL(window.location.href);
+    urlParams.value = Object.fromEntries(url.searchParams.entries());
+    console.log(urlParams.value);
+    brand_id.value = urlParams.value['brand_id'];
+    cc_id.value = urlParams.value['cc_id'];
+    await paymentProcess();
+});
 </script>
 
 <template>
@@ -39,7 +49,7 @@ const paymentProcess = (collab, amount) => {
         <div class="col-12 md:col-6">
             <div class="card">
                 <h5>Default</h5>
-                <Button label="Payment" class="mr-2 mb-2" @click="paymentProcess('adi', 10000)"></Button>
+                <!-- <Button label="Payment" class="mr-2 mb-2" @click="paymentProcess('adi', 10000)"></Button> -->
             </div>
         </div>
     </div>

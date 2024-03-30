@@ -21,6 +21,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `collaboration`
 --
+DROP TABLE IF EXISTS `collaboration`;
 CREATE DATABASE IF NOT EXISTS `collaboration` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `collaboration`;
 
@@ -30,13 +31,13 @@ USE `collaboration`;
 -- Table structure for table `collaboration`
 --
 
-DROP TABLE IF EXISTS `collaboration`;
+
 CREATE TABLE IF NOT EXISTS `collaboration` (
   `cc_id` VARCHAR(100),
   `brand_id` VARCHAR(100),
   `collab_title` varchar(20),
   `collab_status` varchar(20),
-  PRIMARY KEY (`cc_id`, `brand_id`)
+  PRIMARY KEY (`cc_id`, `brand_id`,`collab_title`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
