@@ -76,6 +76,8 @@ def create_checkout_session():
         print(data, 111111)
         stripe.api_key = data["stripe_key"]
 
+        cc_id=data["cc_id"]
+        brand_id=data["brand_id"]
         # storeItems = {1: {"priceInCents": 10000, "name": "Nike Collab"}}
         session = stripe.checkout.Session.create(
             payment_method_types=["card"],
@@ -93,8 +95,8 @@ def create_checkout_session():
             ],
             # success_url=f"{os.environ.get('CLIENT_URL')}",
             # cancel_url=f"{os.environ.get('CLIENT_URL')}/Collab"
-            success_url="http://localhost:5173",
-            cancel_url="http://localhost:5173/Collab",
+            success_url="http://localhost:5173/Payment?cc_id="+cc_id+"&brand_id="+brand_id,
+            cancel_url="http://localhost:5173",
         )
         print(2)
         return jsonify({"url": session.url})

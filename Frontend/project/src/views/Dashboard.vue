@@ -12,17 +12,17 @@ const collab = ref([]);
 const ongoing_collab = ref([]);
 const pending_collab = ref([]);
 const account = ref();
-const acc_type = ref();
+const account_type = ref();
 const id = ref('');
 const columns = ref([]);
-
+const response = ref();
 const notification = ref([]);
 let isGettingNotification = false;
 const notification_ready = ref(false);
 onMounted(() => {
     if (localStorage.id) {
         account.value = localStorage.id;
-        acc_type.value = localStorage.acc_type;
+        account_type.value = localStorage.acc_type;
 
         getCollabInfo();
     } else {
@@ -39,9 +39,14 @@ watch(
 
 const getCollabInfo = async () => {
     try {
-        const response = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
-        console.log(response.data['data']);
-        collab.value = response.data['data'];
+        if (account_type.value == 'cc') {
+            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
+        } else {
+            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/brand/' + account.value);
+        }
+
+        console.log(response.value.data['data']);
+        collab.value = response.value.data['data'];
 
         pending_collab.value = collab.value.filter((item) => item.collab_status === 'Pending');
         pending_collab.value.forEach((item, index) => {
@@ -77,12 +82,20 @@ if (localStorage.acc_type == 'cc') {
 
 const getNotification = async () => {
     try {
+        console.log('Getting notification');
         isGettingNotification = true;
         const response = await axios.get(MicroService['simple'] + Ports['notification'] + '/notification/consume', { params: { topic: account.value } });
         notification.value = response.data['message'].reverse();
-        notification_ready.value=true;
-        console.log(response.data);
+        notification_ready.value = true;
+        console.log(response.data['message']);
         collab.value = response.data;
+        // Format each message in notification.value
+        // for (let i = 0; i < notification.value.length; i++) {
+        //     notification.value[i] = { sender: notification.value[i]['sender'], message: notification.value[i]['message'].replace(/;/g, '<br>') };
+        // }
+    
+    
+    
     } catch (error) {
         console.error(error);
     } finally {
@@ -101,6 +114,7 @@ const intervalId = setInterval(runGetNotification, 10000);
 onBeforeUnmount(() => {
     clearInterval(intervalId);
 });
+
 </script>
 
 <template>
@@ -168,12 +182,12 @@ onBeforeUnmount(() => {
                             <i class="pi pi-dollar text-xl text-blue-500"></i>
                         </div>
                         <span class="text-900 line-height-3">
-                            <h4>{{ message.sender }}</h4>
-                            <span class="text-700">{{ message.message }}</span>
+                            <h4>From {{ message.sender }}</h4>
+                            <span class="text-700" style="white-space: pre-line;">{{ message.message }}</span>
                         </span>
                     </li>
                 </ul>
-                <ProgressSpinner v-else  style="display: flex;"/>
+                <ProgressSpinner v-else style="display: flex" />
             </div>
         </div>
     </div>

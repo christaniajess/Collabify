@@ -17,11 +17,13 @@ app.config["SWAGGER"] = {
 }
 swagger = Swagger(app)
 
-# ACCOUNT_URL = "http://"+os.environ.get("simpleServer")+":3000"
-# COLLAB_URL = "http://"+os.environ.get("simpleServer")+":3001/collaborations"
-ACCOUNT_URL = "http://" + "localhost" + ":3000"
-COLLAB_URL = "http://" + "localhost" + ":3001/collaborations"
-PAYMENT_URL = "http://" + "localhost" + ":5000/checkout-session"
+ACCOUNT_URL = "http://"+os.environ.get("simpleServer")+":3000"
+COLLAB_URL = "http://"+os.environ.get("simpleServer")+":3001/collaborations"
+PAYMENT_URL = "http://" + os.environ.get("simpleServer") + ":3010/checkout-session"
+
+# ACCOUNT_URL = "http://" + "localhost" + ":3000"
+# COLLAB_URL = "http://" + "localhost" + ":3001/collaborations"
+# PAYMENT_URL = "http://" + "localhost" + ":5000/checkout-session"
 # http://localhost:5000/checkout-session
 
 
@@ -168,6 +170,9 @@ def get_profile_data(details):
                 }
             ],
             "stripe_key": stripe_key,
+            "brand_id": details["brand_id"],
+            "cc_id":details["cc_id"],
+            
         },
     )
 
@@ -183,7 +188,7 @@ def get_profile_data(details):
 
     return {
         "code": 200,
-        "payment_result": payment_result,
+        "payment_url": payment_result['url'],
     }
 
 
