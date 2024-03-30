@@ -32,7 +32,7 @@ class Collaboration(db.Model):
 
     cc_id = db.Column(db.VARCHAR(100), nullable=True,primary_key=True)
     brand_id = db.Column(db.VARCHAR(100), nullable=True,primary_key=True)
-    collab_title = db.Column(db.String(20), nullable=True,)
+    collab_title = db.Column(db.String(20), nullable=True,primary_key=True)
     collab_status = db.Column(db.String(20), nullable=True,)
 
     def json(self):
@@ -132,6 +132,8 @@ def get_collaborations_by_cc(cc_id):
     """
     collaborations = db.session.scalars(
         db.select(Collaboration).filter_by(cc_id=cc_id)).all()
+    print(collaborations)
+    
     if collaborations:
         return jsonify(
             {

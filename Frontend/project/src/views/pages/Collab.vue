@@ -52,6 +52,7 @@ const getCollabInfo = async () => {
 
         loaded.value = true;
     } catch (error) {
+        //if 404 do something 
         console.error(error);
     }
 };
