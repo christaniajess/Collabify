@@ -19,7 +19,7 @@ app.config['SWAGGER'] = {
 swagger = Swagger(app)
 
 class Review(db.Model):
-    __tablename__ = 'reviews'
+    __tablename__ = 'review'
 
     review_id = db.Column(db.Integer, primary_key=True)
     cc_id = db.Column(db.Integer, nullable=False)

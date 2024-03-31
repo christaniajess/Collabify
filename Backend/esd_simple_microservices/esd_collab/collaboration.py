@@ -28,7 +28,6 @@ class Collaboration(db.Model):
     __tablename__ = 'collaboration'
 
     cc_id = db.Column(db.VARCHAR(100), nullable=True,primary_key=True)
-    cc_name = db.Column(db.VARCHAR(100), nullable=True,)
     brand_id = db.Column(db.VARCHAR(100), nullable=True,primary_key=True)
     collab_title = db.Column(db.String(20), nullable=True,primary_key=True)
     collab_status = db.Column(db.String(20), nullable=True,)
@@ -36,9 +35,7 @@ class Collaboration(db.Model):
     def json(self):
         dto = {
             'cc_id': self.cc_id,
-            'cc_name': self.cc_name,
             'brand_id': self.brand_id,
-            'brand_name': self.brand_name,
             'collab_title': self.collab_title,
             'collab_status': self.collab_status
         }

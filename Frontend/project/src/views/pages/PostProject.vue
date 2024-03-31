@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
 
@@ -32,12 +32,13 @@ const postProject = async () => {
         });
         console.log(response.data['data']);
         toast.add({ severity: 'success', summary: 'Success', detail: 'Project created successfully', life: 3000 });
-        clearFields();
     } catch (error) {
         console.error(error);
         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create project', life: 3000 });
     }
 };
+
+
 </script>
 
 <template>

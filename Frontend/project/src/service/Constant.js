@@ -9,5 +9,6 @@ export const Ports = {
     blacklist: ':3005',
     notification: ':3006',
     payment: ':3013',
+    complex_brandViewCC: ":3009",
     complex_update_collab: ':3011',
 };

@@ -46,6 +46,12 @@ const model = ref([
                 icon: 'pi pi-fw pi-pencil',
                 // dont have to change the url now, jm will do
                 to: '/Chat'
+            },
+            {
+                label: 'Profile',
+                icon: 'pi pi-fw pi-pencil',
+                // dont have to change the url now, jm will do
+                to: '/viewccprofile'
             }
         ]
     },

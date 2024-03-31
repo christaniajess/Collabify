@@ -122,6 +122,11 @@ const router = createRouter({
                     component: () => import('@/views/utilities/Icons.vue')
                 },
                 {
+                    path: '/pages/CCViewProjects',
+                    name: 'CCViewProjects',
+                    component: () => import('@/views/pages/CCViewProjects.vue')
+                },
+                {
                     path: '/pages/timeline',
                     name: 'timeline',
                     component: () => import('@/views/pages/Timeline.vue')
@@ -130,6 +135,11 @@ const router = createRouter({
                     path: '/pages/empty',
                     name: 'empty',
                     component: () => import('@/views/pages/Empty.vue')
+                },
+                {
+                    path: '/pages/timeline',
+                    name: 'timeline',
+                    component: () => import('@/views/pages/Timeline.vue')
                 },
                 {
                     path: '/collab',
@@ -157,6 +167,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/Payment.vue')
                 },
                 {
+                    path: '/postproject',
+                    name: 'postproject',
+                    component: () => import('@/views/pages/PostProject.vue')
+                },
+                {
                     path: '/request',
                     name: 'request',
                     component: () => import('@/views/pages/Request.vue')
@@ -165,6 +180,16 @@ const router = createRouter({
                     path: '/chat',
                     name: 'chat',
                     component: () => import('@/views/pages/Chat.vue')
+                },
+                {
+                    path: '/viewprojects',
+                    name: 'viewprojects',
+                    component: () => import('@/views/pages/CCViewProjects.vue')
+                },
+                {
+                    path: '/viewccprofile',
+                    name: 'viewccprofile',
+                    component: () => import('@/views/pages/BrandViewCC.vue'),
                 },
                 {
                     path: '/documentation',

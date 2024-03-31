@@ -56,7 +56,7 @@ def get_recommendations():
     
     try:
         # Fetch details of the selected content creator, including their interests
-        selected_creator_response = requests.get(f"{ACCOUNT_CREATOR_URL}/users/{selected_creator_id}")
+        selected_creator_response = requests.get(f"{ACCOUNT_CREATOR_URL}/users?user_id={selected_creator_id}")
         print(selected_creator_response)
         
         if selected_creator_response.status_code == 200:
@@ -72,7 +72,7 @@ def get_recommendations():
             
             temp=[]
             for account in similar_creators_response["data"]:
-                if str(account["user_id"])!=str(selected_creator_id):
+                if str(account["user_id"])!=str(selected_creator_id) and account["acc_type"]=="cc":
                     temp.append(account)
             similar_creators_response["data"]=temp
                 

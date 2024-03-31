@@ -75,7 +75,7 @@ def view_content_creator(cc_id):
         description: An error occurred in retrieving information from the microservices.
     """
     # Step 2: Retrieve view for the content creator from Review microservice
-    view = invoke_http(f"{VIEW_URL}/profile", method='GET',json={"cc_id":cc_id,"brand":True})
+    view = invoke_http(f"{VIEW_URL}/profile", method='GET',json={"cc_id":cc_id})
     if view['code'] not in range(200, 300):
         # Return error response if view cannot be retrieved
         return jsonify(view), view['code']
