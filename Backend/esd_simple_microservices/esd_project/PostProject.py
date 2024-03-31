@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
+import logging
 # import traceback
 from os import environ
 from flask_cors import CORS
@@ -123,8 +124,8 @@ def create_project(user_id):
     ), 201
 
 #if user wants to edit after they created a new project (they cannot change project name!!)
-@app.route('/update_project/<string:user_id>/<string:proj_name>', methods =['PUT'])
-def update_project(user_id,proj_name):
+@app.route('/update_project', methods =['PUT'])
+def update_project():
     """
     Update a project
     ---
@@ -163,7 +164,8 @@ def update_project(user_id,proj_name):
         description: An error occurred while updating the project.
     """
     data = request.json
-
+    user_id = data.get('user_id')
+    proj_name = data.get('proj_name')
     proj_image = data.get('proj_image')
     proj_description = data.get('proj_description')
 
@@ -221,6 +223,7 @@ def delete_project(user_id, proj_name):
       500:
         description: An error occurred while deleting the project.
     """
+    logging.info(f"Deleting project: {proj_name} for user: {user_id}")
     try:
         project = Project.query.filter_by(user_id=user_id, proj_name=proj_name).first()
 
@@ -352,7 +355,7 @@ def get_project():
         description: An error occurred while retrieving projects.
     """
     try:
-        cc_id = request.get_json()["cc_id"]
+        cc_id = request.args.get("cc_id")
         project = Project.query.filter_by(user_id=cc_id).all()
         project_list = []
         for project in project:

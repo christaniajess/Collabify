@@ -105,8 +105,6 @@ services:
     environment:
       STRIPE_PRIVATE_KEY: "sk_test_51OuGi52KwIS1b45LvlM5Q8z0AaTmdNohKDWk3pOEKhNbvOmHJmCEU9DWbSab871Yal3Qw5H2QMXDynjOuQC6NLXB00NBUhtZne"
       CLIENT_URL: "http://localhost:5173"
-      STRIPE_PRIVATE_KEY: sk_test_51OuGi52KwIS1b45LvlM5Q8z0AaTmdNohKDWk3pOEKhNbvOmHJmCEU9DWbSab871Yal3Qw5H2QMXDynjOuQC6NLXB00NBUhtZne
-      CLIENT_URL: "123"
       PYTHONUNBUFFERED: 1
     ports:
       - 3010:5000

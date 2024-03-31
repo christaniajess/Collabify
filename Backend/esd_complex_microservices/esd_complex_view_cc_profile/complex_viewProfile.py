@@ -114,7 +114,7 @@ def get_profile_data(details):
     # Collect Account details
     # Invoke Account Microservice
     print('\n-----Invoking account microservice-----')
-    account_result = invoke_http(ACCOUNT_URL+"/users/"+str(details['cc_id']), method='GET', json=details)
+    account_result = invoke_http(ACCOUNT_URL+"/users?user_id="+str(details['cc_id']), method='GET', json=details)
     print('account_result:', account_result)
 
     code = account_result["code"]
@@ -178,7 +178,7 @@ def get_profile_data(details):
     # Collect project details
     # Invoke Project microservice
     print('\n-----Invoking project microservice-----')
-    project_result = invoke_http(PROJECT_URL+"/get_project", method='GET', json=details)
+    project_result = invoke_http(PROJECT_URL+"/get_project?cc_id="+str(details['cc_id']), method='GET', json=details)
     print('project_result:', project_result)
 
     code = project_result["code"]
