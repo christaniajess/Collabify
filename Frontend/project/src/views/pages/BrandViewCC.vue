@@ -68,10 +68,11 @@ const getCCProfile = async (user_id) => {
 
         console.log(accountDetails.value);
         console.log(projectDetails.value);
-        console.log(typeof projectDetails.value === 'string', 222);
+        console.log(!(typeof projectDetails.value === 'string'), 222);
+        console.log(projectDetails.value, 222);
         console.log('TYPE OF PROJECT DETAILS');
         console.log(typeof projectDetails.value);
-        console.log(reviewDetails.value);
+        console.log(reviewDetails.value['message'], 123);
         console.log('TYPE  OF REVIEW DETAILS');
         console.log(reviewDetails.value);
         console.log(typeof reviewDetails.value === 'object');
@@ -126,28 +127,26 @@ onMounted(async () => {
         <!-- User Profile -->
         <div class="card">
             <div class="m-5">
-                <div class="flex align-items-center gap-3">
+                <div class="flex align-items-center gap-3 mb-3">
                     <Avatar :image="'/src/assets/images/users/' + accountDetails.user_photo" class="mr-2" size="xlarge" shape="circle" />
                     <div>
                         <span class="font-medium text-3xl text-900">
                             {{ accountDetails.full_name }}
                         </span>
-                        <div class="m-0 p-0 flex align-items-center">
+                        <div class="m-0 p-0 flex align-items-center" v-if="collaborationDetails.length">
                             <i class="pi pi-users m-0 p-0"></i>
+
                             <span class="m-0 ml-2 p-0 font-light">{{ collaborationDetails.length }} Collaborations</span>
                         </div>
                     </div>
                     <Chip label="CREATOR" />
                 </div>
+
                 <div class="flex align-items-start flex-column lg:justify-content-between lg:flex-row mt-2">
-                    
-                    
                     <div class="mt-3 lg:mt-0">
                         <Button label="Collaborate" class="p-button-outlined mr-2" icon="pi pi-user-plus"></Button>
                     </div>
                     <!-- to do - place collab request -->
-                    
-
                 </div>
             </div>
 
@@ -157,8 +156,7 @@ onMounted(async () => {
                 <h5>{{ accountDetails.full_name }}'s Projects</h5>
 
                 <div class="card">
-
-                    <Carousel v-if="!(typeof projectDetails.value === 'string')" :value="projectDetails" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions" circular :autoplayInterval="5000">
+                    <Carousel v-if="!(typeof projectDetails === 'string')" :value="projectDetails" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions" circular :autoplayInterval="5000">
                         <template #item="slotProps">
                             <div class="border-1 surface-border border-round m-2 p-3">
                                 <div class="mb-3">
@@ -183,7 +181,7 @@ onMounted(async () => {
             <div class="col-12">
                 <h5>Reviews</h5>
                 <div class="card">
-                    <ScrollPanel v-if="!(typeof reviewDetails.value === 'string')" class="mx-auto" style="width: 90%; height: 500px">
+                    <ScrollPanel v-if="!(typeof reviewDetails['message'] === 'string')" class="mx-auto" style="width: 90%; height: 500px">
                         <div v-for="review in reviewDetails" :key="review.id" class="p-3">
                             <div class="flex gap-3 align-items-center">
                                 <Avatar :image="'/src/assets/images/users/' + review.brand_photo" class="mr-2" size="xlarge" shape="circle" />
@@ -220,9 +218,9 @@ onMounted(async () => {
                 <h5>{{ accountDetails.full_name }}'s Collaborations</h5>
 
                 <div class="card">
-                    <Carousel v-if="!(typeof collaborationDetails.value === 'string')" :value="collaborationDetails" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
+                    <Carousel v-if="!(typeof collaborationDetails['message'] === 'string')" :value="collaborationDetails" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
                         <template #item="slotProps">
-                            <div class="border-1 surface-border border-round m-2 p-3">
+                            <div class="border-1 surface-border border-round m-2 p-3" style="width: fit-content">
                                 <div class="mb-3">
                                     <div class="relative mx-auto">
                                         <img :src="'/src/assets/images/users/' + slotProps.data.brand_photo" :alt="slotProps.data.collab_title" class="w-full border-round" style="width: 250px !important" />
