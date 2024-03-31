@@ -83,7 +83,9 @@ const getCCProfile = async (user_id) => {
         console.log('TYPE OF COLLAB DETAILS');
         console.log(collaborationDetails.value, 333);
         console.log(recommendationDetails.value);
-    } catch (error) {}
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 const getAccountImage = async (user_id) => {
@@ -115,6 +117,33 @@ const clickUser = (user_id) => {
     window.location.reload(true);
 };
 
+const requestCollab = async (user_id) => {
+    try {
+        const response = await axios.post(MicroService['service'] + Ports['complex_place_request'] + '/place_request', {
+            
+            cc_id: String(user_id),
+            brand_id: String(localStorage.id),
+            collab_title: 'wings',
+            collab_status: 'pending'
+        });
+        console.log(response);
+        toast.add({
+            severity: 'success',
+            summary: 'Collaboration Request',
+            detail: 'Collaboration request sent successfully',
+            life: 3000
+        });
+    } catch (error) {
+        console.log(error);
+        toast.add({
+            severity: 'error',
+            summary: 'Collaboration Request',
+            detail: 'Collaboration request failed. ' + error.response.data.message,
+            life: 3000
+        });
+    }
+};
+
 onMounted(async () => {
     await getCCProfile(account.value);
     await getBrandImages(reviewDetails);
@@ -144,7 +173,7 @@ onMounted(async () => {
 
                 <div class="flex align-items-start flex-column lg:justify-content-between lg:flex-row mt-2">
                     <div class="mt-3 lg:mt-0">
-                        <Button label="Collaborate" class="p-button-outlined mr-2" icon="pi pi-user-plus"></Button>
+                        <Button label="Collaborate" class="p-button-outlined mr-2" icon="pi pi-user-plus" @click='requestCollab(accountDetails.user_id)'></Button>
                     </div>
                     <!-- to do - place collab request -->
                 </div>
