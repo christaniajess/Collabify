@@ -28,6 +28,24 @@ const model = ref([
                 icon: 'pi pi-fw pi-pencil',
                 // dont have to change the url now, jm will do
                 to: '/brandsearch'
+            },
+            {
+                label: 'Request',
+                icon: 'pi pi-fw pi-pencil',
+                // dont have to change the url now, jm will do
+                to: '/Request'
+            },
+            {
+                label: 'Projects',
+                icon: 'pi pi fw pi-pencil',
+                // dont have to change the url now, jm will do
+                to: '/viewprojects'
+            },
+            {
+                label: 'Chat',
+                icon: 'pi pi-fw pi-pencil',
+                // dont have to change the url now, jm will do
+                to: '/Chat'
             }
         ]
     },

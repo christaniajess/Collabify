@@ -15,6 +15,7 @@ services:
     restart: always
     environment:
       dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/account
+      PYTHONUNBUFFERED: 1
 
     ports:
       - 3000:5000
@@ -29,6 +30,7 @@ services:
     restart: always
     environment:
       dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/blacklist
+      PYTHONUNBUFFERED: 1
     ports:
       - 3005:5000
 
@@ -42,6 +44,7 @@ services:
     restart: always
     environment:
       dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/collaboration
+      PYTHONUNBUFFERED: 1
     ports:
       - 3001:5000
   
@@ -102,6 +105,9 @@ services:
     environment:
       STRIPE_PRIVATE_KEY: "sk_test_51OuGi52KwIS1b45LvlM5Q8z0AaTmdNohKDWk3pOEKhNbvOmHJmCEU9DWbSab871Yal3Qw5H2QMXDynjOuQC6NLXB00NBUhtZne"
       CLIENT_URL: "http://localhost:5173"
+      STRIPE_PRIVATE_KEY: sk_test_51OuGi52KwIS1b45LvlM5Q8z0AaTmdNohKDWk3pOEKhNbvOmHJmCEU9DWbSab871Yal3Qw5H2QMXDynjOuQC6NLXB00NBUhtZne
+      CLIENT_URL: "123"
+      PYTHONUNBUFFERED: 1
     ports:
       - 3010:5000
 
@@ -116,6 +122,7 @@ services:
     restart: always
     environment:
       dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/project
+      PYTHONUNBUFFERED: 1
     ports:
       - 3003:5000
   #################################
@@ -126,7 +133,8 @@ services:
       context: ./esd_recommend
       dockerfile: Dockerfile
     environment:
-      simpleServer: "172.28.182.145" #original -> 172.28.110.113
+      simpleServer: "172.28.32.147" #original -> 172.28.110.113
+      PYTHONUNBUFFERED: 1
     restart: always
     ports:
       - 3008:5000
@@ -141,5 +149,6 @@ services:
     restart: always
     environment:
       dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/review
+      PYTHONUNBUFFERED: 1
     ports:
       - 3002:5000

@@ -4,8 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
 from flask_cors import CORS
 
-
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("dbURL")
 # app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://root@localhost:3306/collaboration"
@@ -14,7 +12,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
 CORS(app)
-
 
 db = SQLAlchemy(app)
 
@@ -31,6 +28,7 @@ class Collaboration(db.Model):
     __tablename__ = 'collaboration'
 
     cc_id = db.Column(db.VARCHAR(100), nullable=True,primary_key=True)
+    cc_name = db.Column(db.VARCHAR(100), nullable=True,)
     brand_id = db.Column(db.VARCHAR(100), nullable=True,primary_key=True)
     collab_title = db.Column(db.String(20), nullable=True,primary_key=True)
     collab_status = db.Column(db.String(20), nullable=True,)
@@ -38,7 +36,9 @@ class Collaboration(db.Model):
     def json(self):
         dto = {
             'cc_id': self.cc_id,
+            'cc_name': self.cc_name,
             'brand_id': self.brand_id,
+            'brand_name': self.brand_name,
             'collab_title': self.collab_title,
             'collab_status': self.collab_status
         }
@@ -64,9 +64,15 @@ def get_all_collaborations():
                                 cc_id:
                                     type: string
                                     description: Content creator ID
+                                cc_name:
+                                    type: string
+                                    description: Content creator name
                                 brand_id:
                                     type: string
                                     description: Brand ID
+                                brand_name:
+                                    type: string
+                                    description: Brand name
                                 collab_title:
                                     type: string
                                     description: Title of the collaboration
@@ -118,9 +124,15 @@ def get_collaborations_by_cc(cc_id):
                                 cc_id:
                                     type: string
                                     description: Content creator ID
+                                cc_name:
+                                    type: string
+                                    description: Content creator name
                                 brand_id:
                                     type: string
                                     description: Brand ID
+                                brand_name:
+                                    type: string
+                                    description: Brand name
                                 collab_title:
                                     type: string
                                     description: Title of the collaboration
@@ -178,9 +190,15 @@ def get_collaboration_by_status(collab_status):
                                 cc_id:
                                     type: string
                                     description: Content creator ID
+                                cc_name:
+                                    type: string
+                                    description: Content creator name
                                 brand_id:
                                     type: string
                                     description: Brand ID
+                                brand_name:
+                                    type: string
+                                    description: Brand name
                                 collab_title:
                                     type: string
                                     description: Title of the collaboration
@@ -196,7 +214,7 @@ def get_collaboration_by_status(collab_status):
         return jsonify(
             {
                 "code": 200,
-                "data": collabs.json()
+                "data": [collaboration.json() for collaboration in collabs]
             }
         )
     return jsonify(
@@ -235,9 +253,15 @@ def get_collaboration_by_brand(brand_id):
                                 cc_id:
                                     type: string
                                     description: Content creator ID
+                                cc_name:
+                                    type: string
+                                    description: Content creator name
                                 brand_id:
                                     type: string
                                     description: Brand ID
+                                brand_name:
+                                    type: string
+                                    description: Brand name
                                 collab_title:
                                     type: string
                                     description: Title of the collaboration
@@ -284,9 +308,15 @@ def create_collaboration():
                         cc_id:
                             type: string
                             description: Content creator ID
+                        cc_name:
+                            type: string
+                            description: Content creator name
                         brand_id:
                             type: string
                             description: Brand ID
+                        brand_name:
+                            type: string
+                            description: Brand name
                         collab_title:
                             type: string
                             description: Title of the collaboration
@@ -340,9 +370,15 @@ def update_collaboration_status():
                     cc_id:
                         type: string
                         description: Content creator ID
+                    cc_name:
+                        type: string
+                        description: Content creator name
                     brand_id:
                         type: string
                         description: Brand ID
+                    brand_name:
+                        type: string
+                        description: Brand name
                     collab_status:
                         type: string
                         description: Status of the collaboration
