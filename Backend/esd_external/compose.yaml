@@ -1,0 +1,154 @@
+networks:
+  kafka-net:
+    driver: bridge
+    name: kafka-net
+
+services:
+  account:
+    build:
+      context: ./esd_account
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/account
+    ports:
+      - 3000:5000
+
+  collaboration:
+    build:
+      context: ./esd_collab
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/collaboration
+    ports:
+      - 3001:5000
+
+
+  project:
+    build:
+      context: ./esd_project
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/project
+    ports:
+      - 3003:5000
+
+
+
+
+  complex_view_cc_profile:
+    build:
+      context: ./esd_complex_view_cc_profile
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      internalService: "192.168.192.146"
+    ports:
+      - 3004:5100
+
+  blacklist:
+    build:
+      context: ./esd_blacklist
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/blacklist
+    ports:
+      - 3005:5000
+  
+  complex_place_request:
+    build:
+      context: ./esd_complex_place_request
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 3007:5100  
+
+
+
+  complex_brand_view_cc:
+    build:
+      context: ./esd_complex_brand_view_profile
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      internalService: "192.168.192.146"
+
+    ports:
+      - 3009:5100
+
+  complex_update_request:
+    build:
+      context: ./esd_complex_update_collab
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 3011:5100
+
+
+
+  complex_brand_close_collab:
+    build:
+      context: ./esd_complex_brand_close_collab
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      internalService: "192.168.192.146"
+    ports:
+      - 3012:5100
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  zookeeper:
+    image: zookeeper
+    hostname: zookeeper
+    networks:
+      - kafka-net
+
+
+  kafka:
+    restart: always
+    image: confluentinc/cp-kafka
+    hostname: kafka
+    networks:
+      - kafka-net
+    ports:
+      - 9092:9092
+    environment:
+
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 
+
+    depends_on:
+      - zookeeper
+
+
+  notification:
+    restart: always
+    hostname: notification
+    environment:
+      mailgunDomain: sandbox5314bb250fea415fbc2913ee0060a1f5.mailgun.org
+      mailgunAPIKeyID: b02bcf9f-d6c98002
+      mailgunAPIKey: 05bc8f30070e21bc684a40c3e143e144-b02bcf9f-d6c98002
+    build:
+      context: ./esd_kafka
+      dockerfile: Dockerfile
+    networks:
+      - kafka-net
+    ports:
+      - 3006:3000
+

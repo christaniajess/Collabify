@@ -26,9 +26,9 @@ const response = ref();
 const getCollabInfo = async () => {
     try {
         if (account_type.value == 'cc') {
-            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
+            response.value = await axios.get(MicroService['service'] + Ports['collab'] + '/collaborations/cc/' + account.value);
         } else {
-            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/brand/' + account.value);
+            response.value = await axios.get(MicroService['service'] + Ports['collab'] + '/collaborations/brand/' + account.value);
         }
         console.log(response.value.data['data']);
         collab.value = response.value.data['data'];
@@ -53,6 +53,10 @@ const getCollabInfo = async () => {
         loaded.value = true;
     } catch (error) {
         //if 404 do something 
+        if (error.response.status === 404) {
+            collab.value = [];
+            loaded.value = true;
+        }
         console.error(error);
     }
 };
@@ -72,10 +76,10 @@ const update_status = async (brand_id, status = false) => {
         };
 
         console.log(data);
-        const response = await axios.put(MicroService['complex'] + Ports['complex_update_collab'] + '/update_request', data);
+        const response = await axios.put(MicroService['service'] + Ports['complex_update_collab'] + '/update_request', data);
 
         console.log(response.data);
-        getCollabInfo();
+        window.location.reload()
     } catch (error) {
         console.error(error);
     }
@@ -83,10 +87,10 @@ const update_status = async (brand_id, status = false) => {
 
 const rejectCollab = async (brand_id) => {
     try {
-        const response = await axios.delete(MicroService['simple'] + Ports['collab'] + '/collaborations', { data: { cc_id: account.value, brand_id: brand_id } });
+        const response = await axios.delete(MicroService['service'] + Ports['collab'] + '/collaborations', { data: { cc_id: account.value, brand_id: brand_id } });
 
         console.log(response.data);
-        getCollabInfo();
+        window.location.reload()
     } catch (error) {
         console.error(error);
     }
@@ -94,8 +98,10 @@ const rejectCollab = async (brand_id) => {
 
 const setBlacklist = async (brand_id) => {
     try {
-        const response = await axios.post(MicroService['simple'] + Ports['blacklist'] + '/blacklist', { data: { account: account.value, banned_account: brand_id } });
+        const response = await axios.post(MicroService['service'] + Ports['blacklist'] + '/blacklist', { data: { account: account.value, banned_account: brand_id } });
         console.log(response.data['data']);
+        window.location.reload()
+
     } catch (error) {
         console.error(error);
     }
@@ -103,7 +109,7 @@ const setBlacklist = async (brand_id) => {
 
 const payment = async (brand_id, collab_title, pay_amount) => {
     try {
-        const response = await axios.post(MicroService['simple'] + Ports['payment'] + '/close_collab', {
+        const response = await axios.post(MicroService['service'] + Ports['complex_brand_close_collab'] + '/close_collab', {
             cc_id: brand_id,
             brand_id: account.value,
             collab_title: collab_title,
@@ -116,7 +122,6 @@ const payment = async (brand_id, collab_title, pay_amount) => {
             window.location.href = response.data['payment_url'];
         }
 
-        // getCollabInfo();
     } catch (error) {
         console.error(error);
     }
@@ -134,7 +139,7 @@ onBeforeMount(() => {
 });
 
 onMounted(async () => {
-    await getCollabInfo();
+    getCollabInfo();
     if (account_type.value == 'cc') {
         columns.value = [
             { field: 'sn', header: 'S/N' },

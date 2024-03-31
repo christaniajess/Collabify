@@ -11,7 +11,7 @@ const images = ref([]);
 
 const getAllCreators = async () => {
     try {
-        const response = await axios.get(MicroService['simple'] + Ports['account'] + '/all_users');
+        const response = await axios.get(MicroService['service'] + Ports['account'] + '/all_users');
         console.log(response.data['data']);
         // Filter and append only "cc" user type data into account.value
         account.value = response.data['data'].filter((item) => item.acc_type === 'cc');
@@ -30,7 +30,7 @@ const searchCreators = async () => {
     // Use the keyword value here for searching
     console.log(keyword.value);
     try {
-        const response = await axios.get(MicroService['simple'] + Ports['account'] + '/users/interests/' + keyword.value);
+        const response = await axios.get(MicroService['service'] + Ports['account'] + '/users/interests/' + keyword.value);
         console.log(response.data['data']);
         // Filter and append only "cc" user type data into account.value
         account.value = response.data['data'].filter((item) => item.acc_type === 'cc');
@@ -44,6 +44,15 @@ const searchCreators = async () => {
     }
     // Call your search logic/function here
 };
+
+
+const passUserid = (user_id) => {
+    localStorage.clickedUserID = user_id;
+};
+
+
+
+
 
 onMounted(() => {
     getAllCreators();
@@ -76,8 +85,16 @@ onMounted(() => {
                             {{ creator.interests }}
                         </p>
                     </template>
+
                     <template #footer>
-                        <Button label="View Profile" style="width: 100%; background-color: #7879ed; border-color: #7879ed" @click="$router.push('/')" />
+                        <Button
+                            label="View Profile"
+                            style="width: 100%; background-color: #7879ed; border-color: #7879ed"
+                            @click="
+                                passUserid(creator.user_id);
+                                $router.push('/viewccprofile');
+                            "
+                        />
                     </template>
                 </Card>
             </div>

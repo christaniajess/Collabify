@@ -1,0 +1,30 @@
+services:
+  payment:
+    build:
+      context: ./esd_payment
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      webServerURL: "http://localhost:5173"
+    ports:
+      - 3010:5000
+
+  recommendation:
+    build:
+      context: ./esd_recommend
+      dockerfile: Dockerfile
+    environment:
+      - externalService=192.168.192.146
+    restart: always
+    ports:
+      - 3008:5000
+
+  review:
+    build:
+      context: ./esd_review
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      dbURL: mysql+mysqlconnector://root@host.docker.internal:3306/review
+    ports:
+      - 3002:5000

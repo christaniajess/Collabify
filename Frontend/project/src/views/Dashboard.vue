@@ -19,14 +19,15 @@ const response = ref();
 const notification = ref([]);
 let isGettingNotification = false;
 const notification_ready = ref(false);
+const full_name = ref('');
 onMounted(() => {
     if (localStorage.id) {
         account.value = localStorage.id;
         account_type.value = localStorage.acc_type;
-
+        full_name.value = localStorage.full_name;
         getCollabInfo();
     } else {
-        router.push('/auth/login');
+        router.push('/login');
     }
 });
 
@@ -40,9 +41,9 @@ watch(
 const getCollabInfo = async () => {
     try {
         if (account_type.value == 'cc') {
-            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/cc/' + account.value);
+            response.value = await axios.get(MicroService['service'] + Ports['collab'] + '/collaborations/cc/' + account.value);
         } else {
-            response.value = await axios.get(MicroService['simple'] + Ports['collab'] + '/collaborations/brand/' + account.value);
+            response.value = await axios.get(MicroService['service'] + Ports['collab'] + '/collaborations/brand/' + account.value);
         }
 
         console.log(response.value.data['data']);
@@ -60,7 +61,12 @@ const getCollabInfo = async () => {
         });
         loaded.value = true;
     } catch (error) {
-        console.error(error);
+        if (error.response.status === 404) {
+            collab.value = [];
+            loaded.value = true;
+        } else {
+            console.error(error);
+        }
     }
 };
 
@@ -84,7 +90,7 @@ const getNotification = async () => {
     try {
         console.log('Getting notification');
         isGettingNotification = true;
-        const response = await axios.get(MicroService['simple'] + Ports['notification'] + '/notification/consume', { params: { topic: account.value } });
+        const response = await axios.get(MicroService['service'] + Ports['notification'] + '/notification/consume', { params: { topic: account.value } });
         notification.value = response.data['message'].reverse();
         notification_ready.value = true;
         console.log(response.data['message']);
@@ -93,9 +99,6 @@ const getNotification = async () => {
         // for (let i = 0; i < notification.value.length; i++) {
         //     notification.value[i] = { sender: notification.value[i]['sender'], message: notification.value[i]['message'].replace(/;/g, '<br>') };
         // }
-    
-    
-    
     } catch (error) {
         console.error(error);
     } finally {
@@ -114,7 +117,6 @@ const intervalId = setInterval(runGetNotification, 10000);
 onBeforeUnmount(() => {
     clearInterval(intervalId);
 });
-
 </script>
 
 <template>
@@ -167,7 +169,7 @@ onBeforeUnmount(() => {
                 <div class="flex justify-content-between mb-3">
                     <div>
                         <h3>Welcome,</h3>
-                        <div class="text-900 font-medium text-xl">{{ account }}</div>
+                        <div class="text-900 font-medium text-xl">{{ full_name }}</div>
                     </div>
                 </div>
             </div>
@@ -178,12 +180,9 @@ onBeforeUnmount(() => {
 
                 <ul class="p-0 mx-0 mt-0 mb-4 list-none" v-if="notification_ready">
                     <li v-for="message in notification" class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-dollar text-xl text-blue-500"></i>
-                        </div>
                         <span class="text-900 line-height-3">
                             <h4>From {{ message.sender }}</h4>
-                            <span class="text-700" style="white-space: pre-line;">{{ message.message }}</span>
+                            <span class="text-700" style="white-space: pre-line">{{ message.message }}</span>
                         </span>
                     </li>
                 </ul>

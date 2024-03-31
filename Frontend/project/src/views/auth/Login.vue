@@ -10,14 +10,14 @@ const checked = ref(false);
 const router = useRouter();
 
 const validateLogin = async () => {
-    let data={
+    let data = {
         user_id: id.value
-    }
+    };
 
     let config = {
         method: 'get',
         maxBodyLength: Infinity,
-        url: MicroService['simple'] + Ports['account'] + '/users',
+        url: MicroService['service'] + Ports['account'] + '/users',
         params: data
     };
 
@@ -26,9 +26,11 @@ const validateLogin = async () => {
         .then((response) => {
             console.log(response['data']['data']);
             var result = response.data['data'];
-            console.log(666)
+            console.log(666);
             localStorage.id = id.value;
-            localStorage.acc_type=result[0].acc_type;
+            localStorage.acc_type = result.acc_type;
+            localStorage.full_name = result.full_name;
+            router.push('/');
         })
         .catch((error) => {
             console.log(error);
@@ -36,10 +38,7 @@ const validateLogin = async () => {
 };
 
 const login = () => {
-    console.log('Login clicked');
-
     validateLogin();
-    router.push('/');
 };
 </script>
 

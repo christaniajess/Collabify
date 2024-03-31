@@ -1,0 +1,10 @@
+services:
+  complex_brand_close_collab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      internalService: "192.168.192.146"
+    ports:
+      - 3012:5100

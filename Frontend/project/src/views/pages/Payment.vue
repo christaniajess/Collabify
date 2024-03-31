@@ -8,7 +8,7 @@ const brand_id = ref();
 const cc_id = ref();
 
 const paymentProcess = () => {
-    fetch(MicroService['complex'] + Ports['complex_update_collab'] + '/update_request', {
+    fetch(MicroService['service'] + Ports['complex_update_collab'] + '/update_request', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'

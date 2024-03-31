@@ -19,7 +19,7 @@ const getblacklistInfo = async () => {
     let config = {
         method: 'get',
         maxBodyLength: Infinity,
-        url: MicroService['simple'] + Ports['blacklist'] + '/blacklist',
+        url: MicroService['service'] + Ports['blacklist'] + '/blacklist',
         params: data
     };
 
@@ -37,6 +37,10 @@ const getblacklistInfo = async () => {
             loaded.value = true;
         })
         .catch((error) => {
+            if (error.response.status === 404) {
+                blacklist.value = [];
+                loaded.value = true;
+            }
             console.log(error);
         });
 };
@@ -47,7 +51,7 @@ const remove_blacklist = async (banned_account) => {
             account: account.value,
             banned_account: banned_account
         };
-        const response = await axios.delete(MicroService['simple'] + Ports['blacklist'] + '/blacklist', { data: payload });
+        const response = await axios.delete(MicroService['service'] + Ports['blacklist'] + '/blacklist', { data: payload });
 
         console.log(response.data);
         getblacklistInfo();

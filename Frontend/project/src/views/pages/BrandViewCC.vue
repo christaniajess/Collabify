@@ -58,9 +58,8 @@ onBeforeMount(() => {
 const getCCProfile = async (user_id) => {
     try {
         console.log('HELLLOO');
-        console.log(account.value);
-        const response = await axios.get(MicroService['complex'] + Ports['complex_brandViewCC'] + '/view/cc/' + user_id);
-
+        const response = await axios.get(MicroService['service'] + Ports['complex_brandViewCC'] + '/view/cc/' + user_id);
+        console.log(response, 111);
         accountDetails.value = response.data.view.account;
         projectDetails.value = response.data.view.project;
         reviewDetails.value = response.data.view.review;
@@ -69,25 +68,26 @@ const getCCProfile = async (user_id) => {
 
         console.log(accountDetails.value);
         console.log(projectDetails.value);
-        console.log('TYPE OF PROJECT DETAILS')
-        console.log(typeof(projectDetails.value));
+        console.log(typeof projectDetails.value === 'string', 222);
+        console.log('TYPE OF PROJECT DETAILS');
+        console.log(typeof projectDetails.value);
         console.log(reviewDetails.value);
-        console.log('TYPE  OF REVIEW DETAILS')
-        console.log(typeof(reviewDetails.value));
-        console.log(typeof(reviewDetails.value) === "object")
-        if (typeof(reviewDetails.value) === "object") {
+        console.log('TYPE  OF REVIEW DETAILS');
+        console.log(reviewDetails.value);
+        console.log(typeof reviewDetails.value === 'object');
+        if (typeof reviewDetails.value === 'object') {
             showReview.value = true;
         }
         console.log(collaborationDetails.value);
-        console.log('TYPE OF COLLAB DETAILS')
-        console.log(typeof(collaborationDetails.value));
+        console.log('TYPE OF COLLAB DETAILS');
+        console.log(collaborationDetails.value, 333);
         console.log(recommendationDetails.value);
     } catch (error) {}
 };
 
 const getAccountImage = async (user_id) => {
     try {
-        const response = await axios.get(MicroService['simple'] + Ports['account'] + '/users?user_id=' + user_id);
+        const response = await axios.get(MicroService['service'] + Ports['account'] + '/users?user_id=' + user_id);
 
         accountPhoto.value = response.data.data.user_photo;
         accountName.value = response.data.data.full_name;
@@ -95,24 +95,23 @@ const getAccountImage = async (user_id) => {
 };
 
 async function getBrandImages(details) {
-    console.log("GETTING BRAND IMAGES")
+    console.log('GETTING BRAND IMAGES');
     console.log(details.value);
     if (details.value.length > 0) {
-      for (let detail of details.value) {
-        console.log(detail);
-        const photo = await getAccountImage(detail.brand_id);
-        detail.brand_photo = accountPhoto.value;
-        detail.brand_name = accountName.value;
-    }
-    }
-    else {
-      console.log("No details");
+        for (let detail of details.value) {
+            console.log(detail);
+            await getAccountImage(detail.brand_id);
+            detail.brand_photo = accountPhoto.value;
+            detail.brand_name = accountName.value;
+        }
+    } else {
+        console.log('No details');
     }
 }
 
 const clickUser = (user_id) => {
-  localStorage.clickedUserID = user_id;
-  window.location.reload(true);
+    localStorage.clickedUserID = user_id;
+    window.location.reload(true);
 };
 
 onMounted(async () => {
@@ -141,19 +140,25 @@ onMounted(async () => {
                     <Chip label="CREATOR" />
                 </div>
                 <div class="flex align-items-start flex-column lg:justify-content-between lg:flex-row mt-2">
+                    
+                    
                     <div class="mt-3 lg:mt-0">
                         <Button label="Collaborate" class="p-button-outlined mr-2" icon="pi pi-user-plus"></Button>
                     </div>
+                    <!-- to do - place collab request -->
+                    
+
                 </div>
             </div>
 
             <hr />
 
             <div class="col-12">
+                <h5>{{ accountDetails.full_name }}'s Projects</h5>
+
                 <div class="card">
-                    <h5>{{ accountDetails.full_name }}'s Projects</h5>
-                  
-                    <Carousel v-if='!Array.isArray(projectDetails.value)' :value="projectDetails" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions" circular :autoplayInterval="5000">
+
+                    <Carousel v-if="!(typeof projectDetails.value === 'string')" :value="projectDetails" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions" circular :autoplayInterval="5000">
                         <template #item="slotProps">
                             <div class="border-1 surface-border border-round m-2 p-3">
                                 <div class="mb-3">
@@ -178,9 +183,7 @@ onMounted(async () => {
             <div class="col-12">
                 <h5>Reviews</h5>
                 <div class="card">
-                  
-
-                    <ScrollPanel v-if='!showReview.value' class="mx-auto" style="width: 90%; height: 500px">
+                    <ScrollPanel v-if="!(typeof reviewDetails.value === 'string')" class="mx-auto" style="width: 90%; height: 500px">
                         <div v-for="review in reviewDetails" :key="review.id" class="p-3">
                             <div class="flex gap-3 align-items-center">
                                 <Avatar :image="'/src/assets/images/users/' + review.brand_photo" class="mr-2" size="xlarge" shape="circle" />
@@ -189,7 +192,7 @@ onMounted(async () => {
                                     <h6 class="p-0 m-0">{{ review.brand_name }}</h6>
                                     <Rating v-model="review.rating" readonly :cancel="false"></Rating>
                                 </div>
-                            </div>``
+                            </div>
                             <p class="mt-3">
                                 {{ review.content }}
                             </p>
@@ -214,9 +217,10 @@ onMounted(async () => {
             <hr />
 
             <div class="col-12">
+                <h5>{{ accountDetails.full_name }}'s Collaborations</h5>
+
                 <div class="card">
-                    <h5>{{ accountDetails.full_name }}'s Collaborations</h5>
-                    <Carousel v-if="!Array.isArray(collaborationDetails.value)" :value="collaborationDetails" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
+                    <Carousel v-if="!(typeof collaborationDetails.value === 'string')" :value="collaborationDetails" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
                         <template #item="slotProps">
                             <div class="border-1 surface-border border-round m-2 p-3">
                                 <div class="mb-3">
@@ -238,8 +242,9 @@ onMounted(async () => {
             <hr />
 
             <div class="col-12">
+                <h5>Recommended for you</h5>
+
                 <div class="card">
-                    <h5>Recommended for you</h5>
                     <Carousel :value="recommendationDetails" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions" circular :autoplayInterval="5000">
                         <template #item="slotProps">
                             <div v-ripple class="p-ripple cursor-pointer border-1 surface-border border-round m-2 p-3" @click="clickUser(slotProps.data.user_id)">
