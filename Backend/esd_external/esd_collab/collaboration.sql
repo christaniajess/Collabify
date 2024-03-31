@@ -42,26 +42,26 @@ CREATE TABLE `collaboration` (
 --
 
 INSERT INTO `collaboration` (`cc_id`, `brand_id`, `collab_title`, `collab_status`) VALUES
-('123', '103', 'Tech Data Collaboration', 'Pending'),
-('124', '105', 'Starbucks Marketing Campaign', 'In-progress'),
-('125', '107', 'United Nations Charity Event', 'Review'),
-('126', '109', 'Tesla Product Launch', 'Pending'),
-('127', '111', 'Amazon Prime Video Series Production', 'In-progress'),
-('128', '113', 'Nike Endorsement Deal', 'Review'),
-('129', '115', 'Microsoft Software Development', 'Pending'),
+('100', '103', 'Max Data Collaboration', 'Pending'),
+('100', '105', 'Media Marketing Campaign', 'In-progress'),
+('100', '107', 'Brandify Health & Wellness Event', 'Pending'),
+('100', '109', 'Tech Product Launch', 'Pending'),
+('100', '111', 'Video Series Production', 'In-progress'),
+('100', '113', 'Acme Endorsement Deal', 'Review'),
+('100', '114', 'Tech Review Video', 'Review'),
+('100', '116', 'Warner Media Content Creation', 'Pending'),
+('100', '117', 'Starbucks Website Campaign', 'Pending'),
+('100', '118', 'Tesla Campaign', 'In-progress'),
+('100', '120', 'Brandify Charity Event', 'Review'),
+('123', '117', 'Fashion Line Promotion', 'Pending'),
+('127', '117', 'Michael Jackson Music Album Launch', 'In-progress'),
+('128', '117', 'Olivia Jones Lifestyle Blog Feature', 'In-progress'),
 ('130', '117', 'Apple Product Launch Event', 'In-progress'),
-('131', '119', 'Acme Corporation Partnership', 'Review'),
-('132', '121', 'Warner Media Content Creation', 'Pending'),
-('133', '123', 'Lucy Smith Fashion Line Promotion', 'Pending'),
-('134', '125', 'Sophia William Beauty Campaign', 'In-progress'),
-('135', '127', 'Liam Brown Tech Review Video', 'Review'),
-('136', '129', 'Emma Miller Health & Wellness Event', 'Pending'),
-('137', '131', 'Michael Jackson Music Album Launch', 'In-progress'),
-('138', '133', 'Ava Taylor Fitness Apparel Sponsorship', 'Review'),
-('139', '135', 'Alexander Andersons Podcast Collaboration', 'Pending'),
-('140', '137', 'Olivia Jones Lifestyle Blog Feature', 'In-progress'),
-('141', '139', 'William Davis Travel Vlog Partnership', 'Review'),
-('142', '141', 'James Johnson Food Recipe Series', 'Pending');
+('131', '117', 'Acme Corporation Partnership', 'Review'),
+('138', '117', 'Ava Taylor Fitness Apparel Sponsorship', 'Review'),
+('139', '117', 'Alexander Andersons Podcast Collaboration', 'Pending'),
+('141', '117', 'William Davis Travel Vlog Partnership', 'Review'),
+('142', '117', 'James Johnson Food Recipe Series', 'Pending');
 
 --
 -- Indexes for dumped tables
