@@ -40,6 +40,7 @@ onMounted(async () => {
     console.log(urlParams.value);
     brand_id.value = urlParams.value['brand_id'];
     cc_id.value = urlParams.value['cc_id'];
+    console.log(brand_id.value, cc_id.value);
     await paymentProcess();
 });
 </script>

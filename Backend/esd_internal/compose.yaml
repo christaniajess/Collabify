@@ -14,6 +14,7 @@ services:
       context: ./esd_recommend
       dockerfile: Dockerfile
     environment:
+      # to change
       externalService: "192.168.192.146" #  declaration using - externalService didn't work, so changed to this. 
     restart: always
     ports:

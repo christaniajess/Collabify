@@ -28,6 +28,9 @@ const accountPhoto = ref('');
 const accountName = ref('');
 const showReview = ref(false);
 
+const collab_title = ref('');
+const collab_title_visible = ref(false);
+
 const responsiveOptions = ref([
     {
         breakpoint: '1024px',
@@ -120,11 +123,10 @@ const clickUser = (user_id) => {
 const requestCollab = async (user_id) => {
     try {
         const response = await axios.post(MicroService['service'] + Ports['complex_place_request'] + '/place_request', {
-            
             cc_id: String(user_id),
             brand_id: String(localStorage.id),
-            collab_title: 'wings',
-            collab_status: 'pending'
+            collab_title: collab_title.value,
+            collab_status: 'Pending'
         });
         console.log(response);
         toast.add({
@@ -173,9 +175,28 @@ onMounted(async () => {
 
                 <div class="flex align-items-start flex-column lg:justify-content-between lg:flex-row mt-2">
                     <div class="mt-3 lg:mt-0">
-                        <Button label="Collaborate" class="p-button-outlined mr-2" icon="pi pi-user-plus" @click='requestCollab(accountDetails.user_id)'></Button>
+                        <Button label="Collaborate" class="p-button-outlined mr-2" icon="pi pi-user-plus" @click="collab_title_visible = true"></Button>
                     </div>
                     <!-- to do - place collab request -->
+                    <Dialog v-model:visible="collab_title_visible" modal header="Collab Request" :style="{ width: '25rem' }">
+                        <span class="p-text-secondary block mb-5">Send a collaboration request</span>
+                        <div class="flex align-items-center gap-3 mb-3">
+                            <label for="username" class="font-semibold w-6rem">Collab Title</label>
+                            <InputText v-model="collab_title" id="username" class="flex-auto" autocomplete="off" />
+                        </div>
+
+                        <div class="flex justify-content-end gap-2">
+                            <Button type="button" label="Cancel" severity="secondary" @click="collab_title_visible = false"></Button>
+                            <Button
+                                type="button"
+                                label="Send"
+                                @click="
+                                    collab_title_visible = false;
+                                    requestCollab(accountDetails.user_id);
+                                "
+                            ></Button>
+                        </div>
+                    </Dialog>
                 </div>
             </div>
 

@@ -24,7 +24,7 @@ collab_URL = "http://host.docker.internal:3001/collaborations" # changed from co
 
 
 @app.route("/place_request", methods=['POST'])
-def place_order():
+def place_request():
     """
     Place a Collaboration Request
     ---
@@ -109,8 +109,8 @@ def processPlaceRequest(collab):
             print('collab_result:', collab_result)
             
             return {
-                "code": 500,
-                "message": blacklist_result
+                "code": 409,
+                "message": "Collaboration already exist!"
             }
         else:
             

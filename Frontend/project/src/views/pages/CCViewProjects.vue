@@ -140,7 +140,7 @@ onMounted(() => {
             </div>
             <div class="field">
                 <label for="images">Add images:</label>
-                <FileUpload ref="fileUploadRef" name="demo[]" @uploader="onUpload" :multiple="true" accept="image/*" :maxFileSize="1000000" customUpload />
+                <FileUpload ref="fileUploadRef" name="demo[]" @uploader="onUpload" :multiple="true" accept="image/*" :maxFileSize="1000000" customUpload disabled/>
             </div>
             <div class="field">
                 <label for="description">Project description:</label>
@@ -189,7 +189,7 @@ onMounted(() => {
                             </div>
                             <div class="field">
                                 <label for="images">Add images:</label>
-                                <FileUpload ref="fileUploadRef" name="demo[]" @uploader="onUpload" :multiple="true" accept="image/*" :maxFileSize="1000000" customUpload />
+                                <FileUpload ref="fileUploadRef" name="demo[]" @uploader="onUpload" :multiple="true" accept="image/*" :maxFileSize="1000000" customUpload disabled/>
                             </div>
                             <div class="field">
                                 <label for="description">Project description:</label>

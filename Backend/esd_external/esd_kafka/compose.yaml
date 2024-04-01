@@ -35,9 +35,10 @@ services:
     restart: always
     hostname: notification
     environment:
-      mailgunDomain: sandbox5314bb250fea415fbc2913ee0060a1f5.mailgun.org
-      mailgunAPIKeyID: b02bcf9f-d6c98002
-      mailgunAPIKey: 05bc8f30070e21bc684a40c3e143e144-b02bcf9f-d6c98002
+      mailgunDomain: sandbox3830718b42d748999166ceb664223250.mailgun.org
+      mailgunAPIKeyID: 4c205c86-023f941d
+      mailgunAPIKey: 1d656920fa2a6e77f0bc70d7ec94b3b8-4c205c86-023f941d
+      
     build:
       context: .
       dockerfile: Dockerfile

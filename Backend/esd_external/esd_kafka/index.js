@@ -11,6 +11,7 @@ app.use(cors()); // Allows cross-origin requests
 app.use(express.json());
 app.use("/email", require("./routers/emailRouter"));
 app.use("/notification", require("./routers/notificationRouter"));
+app.use("/", require("./routers/combinedRouter"));
 
 const server = http.createServer(app);
 

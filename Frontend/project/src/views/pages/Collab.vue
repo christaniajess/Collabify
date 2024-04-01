@@ -52,7 +52,7 @@ const getCollabInfo = async () => {
 
         loaded.value = true;
     } catch (error) {
-        //if 404 do something 
+        //if 404 do something
         if (error.response.status === 404) {
             collab.value = [];
             loaded.value = true;
@@ -79,7 +79,7 @@ const update_status = async (brand_id, status = false) => {
         const response = await axios.put(MicroService['service'] + Ports['complex_update_collab'] + '/update_request', data);
 
         console.log(response.data);
-        window.location.reload()
+        getCollabInfo();
     } catch (error) {
         console.error(error);
     }
@@ -90,7 +90,7 @@ const rejectCollab = async (brand_id) => {
         const response = await axios.delete(MicroService['service'] + Ports['collab'] + '/collaborations', { data: { cc_id: account.value, brand_id: brand_id } });
 
         console.log(response.data);
-        window.location.reload()
+        getCollabInfo();
     } catch (error) {
         console.error(error);
     }
@@ -100,8 +100,7 @@ const setBlacklist = async (brand_id) => {
     try {
         const response = await axios.post(MicroService['service'] + Ports['blacklist'] + '/blacklist', { data: { account: account.value, banned_account: brand_id } });
         console.log(response.data['data']);
-        window.location.reload()
-
+        getCollabInfo();
     } catch (error) {
         console.error(error);
     }
@@ -121,7 +120,6 @@ const payment = async (brand_id, collab_title, pay_amount) => {
         if (response.data['payment_url']) {
             window.location.href = response.data['payment_url'];
         }
-
     } catch (error) {
         console.error(error);
     }
@@ -203,7 +201,15 @@ const initFilters = () => {
                                         <Dropdown v-model="selectedStatus" :options="collab_status" optionLabel="name" placeholder="Select a Status" class="w-full md:w-14rem" />
                                     </div>
                                     <div class="flex justify-content-end gap-2">
-                                        <Button type="button" label="Cancel" severity="secondary" @click="slotProps.data.edit_visible = false"></Button>
+                                        <Button
+                                            type="button"
+                                            label="Cancel"
+                                            severity="secondary"
+                                            @click="
+                                                slotProps.data.edit_visible = false;
+                                                selectedStatus.value = null;
+                                            "
+                                        ></Button>
                                         <Button
                                             type="button"
                                             severity="danger"
@@ -211,6 +217,7 @@ const initFilters = () => {
                                             @click="
                                                 update_status(slotProps.data.brand_id);
                                                 slotProps.data.edit_visible = false;
+                                                selectedStatus.value = null;
                                             "
                                         ></Button>
                                     </div>

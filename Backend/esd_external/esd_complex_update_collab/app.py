@@ -105,7 +105,8 @@ def processUpdateRequest(collab):
                 "message": "Collaboration updated!\nBrand: "+collab_result["data"]["brand_id"]+"\nCollab title: "+collab_result["data"]["collab_title"]+"\nCollab_status: "+collab_result["data"]["collab_status"],
                 "receiver":collab_result["data"]["cc_id"]
             }
-            invoke_http(notification_URL+"/notification/publish", method="POST", json=data)
+            invoke_http(notification_URL+"/notify", method="POST", json=data)
+            
             
         elif (collab_result["data"]["collab_status"]=="Review"):
             data={
