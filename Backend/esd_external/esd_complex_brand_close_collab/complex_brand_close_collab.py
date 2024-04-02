@@ -30,59 +30,45 @@ PAYMENT_URL = "http://" + os.environ.get("internalService") + ":3010/checkout-se
 @app.route("/close_collab", methods=["POST"])
 def close_collab():
     """
-    Get a Comprehensive Profile View
+    Close Collaboration and Initiate Payment
     ---
-    parameters:
-      - in: requestBody
-        name: cc_id
+    requestBody:
         required: true
-        schema:
-          type: object
-          properties:
-            cc_id:
-              type: integer
-          description: The unique identifier of the content creator for whom the profile is fetched.
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        cc_id:
+                            type: string
+                            description: The unique identifier of the content creator involved in the collaboration.
+                        brand_id:
+                            type: string
+                            description: The unique identifier of the brand involved in the collaboration.
+                        collab_title:
+                            type: string
+                            description: The title of the collaboration.
+                        amount:
+                            type: number
+                            format: float
+                            description: The amount to be paid for the collaboration.
     responses:
       200:
-        description: Successfully retrieved the comprehensive profile view, including account details, collaborations, reviews, and projects.
+        description: Collaboration successfully closed and payment initiated. Returns the payment URL.
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                account:
-                  type: object
-                  description: Account details of the content creator.
-                  properties:
-                    user_id:
-                      type: integer
-                      description: The unique identifier of the content creator.
-                    username:
-                      type: string
-                      description: The username of the content creator.
-                    # Additional account properties...
-                collab:
-                  type: array
-                  description: A list of collaborations associated with the content creator.
-                  items:
-                    type: object
-                    # Define the schema for a single collaboration...
-                review:
-                  type: array
-                  description: A list of reviews given to the content creator.
-                  items:
-                    type: object
-                    # Define the schema for a single review...
-                project:
-                  type: array
-                  description: A list of projects created by the content creator.
-                  items:
-                    type: object
-                    # Define the schema for a single project...
+                type: object
+                properties:
+                    payment_url:
+                        type: string
+                        description: URL to redirect for payment processing.
       400:
-        description: Invalid JSON input or missing required query parameter `cc_id`.
+        description: Invalid JSON input.
+      404:
+        description: Account not found for the specified user ID.
       500:
-        description: Internal server error or unable to fetch from external services.
+        description: Internal server error. Could be due to failure in invoking account or payment microservices.
     """
     # Simple check of input format and data of the request are JSON
     if request.is_json:
@@ -115,7 +101,7 @@ def close_collab():
                 jsonify(
                     {
                         "code": 500,
-                        "message": "complex_viewProfile.py internal error: " + ex_str,
+                        "message": "Internal server error: " + ex_str,
                     }
                 ),
                 500,

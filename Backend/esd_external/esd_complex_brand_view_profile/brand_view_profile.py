@@ -24,7 +24,7 @@ RECOMMENDATION_URL = "http://"+os.environ.get("internalService")+":3008/recommen
 @app.route("/view/cc/<int:cc_id>", methods=['GET'])
 def view_content_creator(cc_id):
     """
-    View Content Creator Profile and Recommendations
+    View Content Creator Profile with Recommendations
     ---
     parameters:
       - in: path
@@ -32,10 +32,10 @@ def view_content_creator(cc_id):
         required: true
         schema:
           type: integer
-          description: The unique identifier of the content creator for whom the profile and recommendations are fetched.
+          description: The unique identifier of the content creator whose profile and recommendations are being requested.
     responses:
       200:
-        description: Successfully retrieved content creator profile and recommendations.
+        description: Successfully retrieved content creator profile along with recommendations for similar creators.
         content:
           application/json:
             schema:
@@ -43,36 +43,22 @@ def view_content_creator(cc_id):
               properties:
                 view:
                   type: object
-                  description: Contains profile details of the content creator.
+                  description: The profile details of the content creator.
                   properties:
-                    user_id:
-                      type: integer
-                      description: The unique identifier of the content creator.
-                    username:
-                      type: string
-                      description: The username of the content creator.
-                    interests:
-                      type: string
-                      description: The interests of the content creator.
+                    # Specify the structure of the content creator's profile details
                 recommendation:
                   type: array
-                  description: A list of recommended content creators based on similar interests.
+                  description: A list of recommended similar content creators based on interests.
                   items:
                     type: object
                     properties:
-                      user_id:
-                        type: integer
-                        description: The unique identifier of the recommended content creator.
-                      username:
-                        type: string
-                        description: The username of the recommended content creator.
-                      interests:
-                        type: string
-                        description: The interests of the recommended content creator, potentially matching or similar to the specified creator's interests.
+                      # Specify the structure of a recommendation item
+      400:
+        description: Bad request. The request was not properly formatted.
       404:
         description: Content creator profile or recommendations not found.
       500:
-        description: An error occurred in retrieving information from the microservices.
+        description: An internal server error occurred while fetching the profile or recommendations.
     """
     # Step 2: Retrieve view for the content creator from Review microservice
     view = invoke_http(f"{VIEW_URL}/profile?cc_id="+str(cc_id), method='GET')

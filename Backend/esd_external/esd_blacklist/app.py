@@ -43,32 +43,6 @@ def home():
 
 @app.route("/blacklist/all")
 def get_all():
-    """
-    List all blacklist records
-    ---
-    responses:
-        200:
-            description: A list of all blacklist records.
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: object
-                            properties:
-                                account:
-                                    type: string
-                                    description: The identifier of the account.
-                                banned_account:
-                                    type: string
-                                    description: The identifier of the banned account.
-                                date:
-                                    type: string
-                                    format: date-time
-                                    description: The date and time when the account was added to the blacklist.
-        404:
-            description: No blacklist records found.
-    """
     blacklist = db.session.scalars(db.select(Blacklist)).all()
     if len(blacklist):
         return jsonify(
@@ -90,43 +64,30 @@ def get_all():
 @app.route("/blacklist")
 def find_by_account():
     """
-    Find blacklist records
+    Get All Blacklist Records
     ---
-    parameters:
-        - in: query
-          name: account
-          schema:
-            type: string
-          required: true
-          description: The identifier of the account to filter blacklist records.
-        - in: query
-          name: banned_account
-          schema:
-            type: string
-          required: true
-          description: The identifier of the banned account to filter blacklist records.
     responses:
-        200:
-            description: A list of blacklist records matching the criteria.
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: object
-                            properties:
-                                account:
-                                    type: string
-                                    description: The identifier of the account.
-                                banned_account:
-                                    type: string
-                                    description: The identifier of the banned account.
-                                date:
-                                    type: string
-                                    format: date-time
-                                    description: The date and time when the account was added to the blacklist.
-        404:
-            description: No matching blacklist records found.
+      200:
+        description: Successfully retrieved all blacklist records.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  account:
+                    type: string
+                    description: The account ID of the user.
+                  banned_account:
+                    type: string
+                    description: The account ID of the banned user.
+                  date:
+                    type: string
+                    format: date-time
+                    description: The date and time when the blacklist record was created.
+      404:
+        description: There are no blacklists found.
     """
     account = request.args.get('account')   
     print(account)
@@ -151,32 +112,34 @@ def find_by_account():
 @app.route("/blacklist", methods=['POST'])
 def create_blacklist():
     """
-    Create a blacklist record
+    Find Blacklist Record by Account
     ---
-    requestBody:
+    parameters:
+      - in: query
+        name: account
         required: true
-        content:
-            application/json:
-                schema:
-                    type: object
-                    properties:
-                        account:
-                            type: string
-                            description: The identifier of the account initiating the blacklist.
-                        banned_account:
-                            type: string
-                            description: The identifier of the account being blacklisted.
-                        date:
-                            type: string
-                            format: date-time
-                            description: The date and time when the blacklist record is created. This field is auto-generated and need not be provided in the request.
+        schema:
+          type: string
+          description: The account ID of the user for which the blacklist records are being queried.
     responses:
-        201:
-            description: Blacklist record created successfully.
-        400:
-            description: Blacklist record already exists or invalid input data.
-        500:
-            description: Internal server error occurred while creating the blacklist record.
+      200:
+        description: Successfully retrieved blacklist records for the account.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  banned_account:
+                    type: string
+                  date:
+                    type: string
+                    format: date-time
+      404:
+        description: Blacklist records not found for the specified account.
     """
     data = request.get_json()["data"]
     account = data['account']
@@ -223,7 +186,7 @@ def create_blacklist():
 @app.route("/blacklist", methods=['DELETE'])
 def delete_blacklist():
     """
-    Delete a blacklist record
+    Delete a Blacklist Record
     ---
     requestBody:
         required: true
@@ -234,17 +197,15 @@ def delete_blacklist():
                     properties:
                         account:
                             type: string
-                            description: The identifier of the account associated with the blacklist record to be deleted.
+                            description: The account ID of the user requesting the blacklist deletion.
                         banned_account:
                             type: string
-                            description: The identifier of the banned account associated with the blacklist record to be deleted.
+                            description: The account ID of the banned user whose record is to be deleted.
     responses:
-        200:
-            description: Blacklist record deleted successfully.
-        404:
-            description: Blacklist record not found or does not exist.
-        400:
-            description: Invalid request format or missing required fields.
+      200:
+        description: Blacklist record successfully deleted.
+      404:
+        description: Blacklist record not found.
     """
     data = request.get_json()
     account = data['account']

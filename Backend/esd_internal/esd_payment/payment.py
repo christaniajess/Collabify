@@ -34,41 +34,51 @@ def create_checkout_session():
                 schema:
                     type: object
                     properties:
+                        stripe_key:
+                            type: string
+                            description: Stripe secret key to authenticate the request.
+                        cc_id:
+                            type: string
+                            description: The unique identifier of the content creator involved in the transaction.
+                        brand_id:
+                            type: string
+                            description: The unique identifier of the brand initiating the payment.
                         items:
                             type: array
-                            description: List of items to include in the checkout session.
+                            description: List of items for payment.
                             items:
                                 type: object
                                 properties:
-                                    id:
+                                    collab_title:
+                                        type: string
+                                        description: Title of the collaboration.
+                                    amount:
                                         type: integer
-                                        description: The unique ID of the item.
+                                        description: Amount to be paid for the item in cents.
                                     quantity:
                                         type: integer
-                                        description: Quantity of the item to purchase.
-                    required:
-                        - items
+                                        description: Number of items (should typically be 1).
     responses:
-        200:
-            description: Checkout session created successfully. Returns the session URL for redirection.
-            content:
-                application/json:
-                    schema:
-                        type: object
-                        properties:
-                            url:
-                                type: string
-                                description: URL to the Stripe checkout session. Redirect your user to this URL for the payment process.
-        500:
-            description: An error occurred in creating the checkout session. Check the error message for more details.
-            content:
-                application/json:
-                    schema:
-                        type: object
-                        properties:
-                            error:
-                                type: string
-                                description: Detailed error message.
+      200:
+        description: Checkout session created successfully. Returns the URL for the checkout session.
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                    url:
+                        type: string
+                        description: The URL to redirect the user for payment processing.
+      500:
+        description: An error occurred while creating the checkout session. Returns an error message.
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                    error:
+                        type: string
+                        description: A descriptive error message.
     """
     try:
         print("h232")

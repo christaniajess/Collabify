@@ -19,38 +19,45 @@ ACCOUNT_CREATOR_URL = "http://"+os.environ.get("externalService")+":3000"
 @app.route('/recommendations', methods=['GET'])
 def get_recommendations():
     """
-    Get recommendations for a content creator
+    Get Recommendations for Selected Content Creator
     ---
     parameters:
       - in: query
         name: creator_id
         required: true
         schema:
-          type: integer
-          description: The unique identifier of the content creator for whom to find recommendations.
+          type: string
+          description: The unique identifier of the selected content creator for whom recommendations are being requested.
     responses:
       200:
-        description: Successfully retrieved a list of recommended content creators with similar interests.
+        description: Successfully retrieved recommendations for similar content creators based on interests.
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  user_id:
-                    type: integer
-                    description: The unique identifier of the recommended content creator.
-                  username:
-                    type: string
-                    description: The username of the recommended content creator.
-                  interests:
-                    type: string
-                    description: The interests of the recommended content creator, potentially matching or similar to the specified creator's interests.
+              type: object
+              properties:
+                code:
+                  type: integer
+                  description: HTTP status code indicating the request was successful.
+                similar_creators:
+                  type: array
+                  description: An array of similar content creators.
+                  items:
+                    type: object
+                    properties:
+                      user_id:
+                        type: integer
+                        description: The unique identifier of a similar content creator.
+                      username:
+                        type: string
+                        description: The username of a similar content creator.
+                      interests:
+                        type: string
+                        description: The interests of a similar content creator, matching or similar to the selected creator's interests.
       404:
-        description: Content creator not found or no recommendations found based on the specified criteria.
+        description: Failed to fetch similar content creators based on interests.
       500:
-        description: Network error or internal server error occurred while attempting to fetch recommendations or communicate with the Account Service.
+        description: Network error while contacting the Account Service.
     """
     selected_creator_id = request.get_json()['creator_id']
     

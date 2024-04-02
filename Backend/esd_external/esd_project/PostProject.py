@@ -47,7 +47,7 @@ class Project(db.Model):
 @app.route('/create_project/<string:user_id>', methods=['POST'])
 def create_project(user_id):
     """
-    Create a project
+    Create a New Project
     ---
     parameters:
       - in: path
@@ -55,39 +55,26 @@ def create_project(user_id):
         required: true
         schema:
           type: string
-        description: The unique identifier of the user creating the project.
+          description: The unique identifier of the user creating the project.
     requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              proj_name:
-                type: string
-                description: The name of the project.
-              proj_image:
-                type: string
-                description: URL to the project's representative image.
-              proj_description:
-                type: string
-                description: Detailed description of the project.
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        proj_name:
+                            type: string
+                            description: The name of the project.
+                        proj_image:
+                            type: string
+                            description: URL to the project's image.
+                        proj_description:
+                            type: string
+                            description: A detailed description of the project.
     responses:
       201:
-        description: Project created successfully. Returns the created project details.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                user_id:
-                  type: string
-                proj_name:
-                  type: string
-                proj_image:
-                  type: string
-                proj_description:
-                  type: string
+        description: Project created successfully.
       500:
         description: An error occurred while creating the project.
     """
@@ -127,34 +114,24 @@ def create_project(user_id):
 @app.route('/update_project', methods =['PUT'])
 def update_project():
     """
-    Update a project
+    Update an Existing Project
     ---
-    parameters:
-      - in: path
-        name: user_id
-        required: true
-        schema:
-          type: string
-        description: The user ID of the project owner.
-      - in: path
-        name: proj_name
-        required: true
-        schema:
-          type: string
-        description: The name of the project to update.
     requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              proj_image:
-                type: string
-                description: Updated URL to the project's image.
-              proj_description:
-                type: string
-                description: Updated project description.
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        user_id:
+                            type: string
+                            description: The unique identifier of the user updating the project.
+                        proj_name:
+                            type: string
+                            description: The name of the project to be updated. Cannot be changed.
+                        proj_description:
+                            type: string
+                            description: New detailed description of the project.
     responses:
       200:
         description: Project updated successfully.
@@ -200,7 +177,7 @@ def update_project():
 @app.route('/delete_project/<string:user_id>/<string:proj_name>', methods=['DELETE'])
 def delete_project(user_id, proj_name):
     """
-    Delete a project
+    Delete a Project
     ---
     parameters:
       - in: path
@@ -208,13 +185,13 @@ def delete_project(user_id, proj_name):
         required: true
         schema:
           type: string
-        description: The user ID of the project owner.
+          description: The unique identifier of the user whose project is to be deleted.
       - in: path
         name: proj_name
         required: true
         schema:
           type: string
-        description: The name of the project to be deleted.
+          description: The name of the project to be deleted.
     responses:
       200:
         description: Project deleted successfully.
@@ -251,28 +228,11 @@ def delete_project(user_id, proj_name):
 @app.route('/get_all_project', methods=['GET'])
 def get_all_project():
     """
-    Get all projects
+    Get All Projects
     ---
     responses:
       200:
-        description: A list of all projects.
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  proj_id:
-                    type: integer
-                  user_id:
-                    type: string
-                  proj_name:
-                    type: string
-                  proj_image:
-                    type: string
-                  proj_description:
-                    type: string
+        description: Successfully retrieved all projects.
       404:
         description: No projects found.
       500:
@@ -320,35 +280,18 @@ def get_all_project():
 @app.route('/get_project', methods=['GET'])
 def get_project():
     """
-    Get projects by content creator ID
+    Get Projects by Content Creator ID
     ---
     parameters:
       - in: query
         name: cc_id
+        required: true
         schema:
           type: string
-        required: true
-        description: The content creator ID to retrieve projects for.
+          description: The unique identifier of the content creator whose projects are being queried.
     responses:
       200:
-        description: A list of projects for the given content creator ID.
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  proj_id:
-                    type: integer
-                  user_id:
-                    type: string
-                  proj_name:
-                    type: string
-                  proj_image:
-                    type: string
-                  proj_description:
-                    type: string
+        description: Successfully retrieved projects for the specified content creator.
       404:
         description: No projects found for the given content creator ID.
       500:

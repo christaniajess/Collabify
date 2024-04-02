@@ -41,41 +41,41 @@ class User(db.Model):
 @app.route('/all_users', methods=['GET'])
 def list_users():
     """
-    List all users
+    List All Users
     ---
     responses:
-        200:
-            description: A list of users
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: object
-                            properties:
-                                user_id:
-                                    type: integer
-                                    description: The unique identifier for a user
-                                username:
-                                    type: string
-                                    description: User's chosen username
-                                acc_type:
-                                    type: string
-                                    description: Account type
-                                full_name:
-                                    type: string
-                                    description: User's full name
-                                email:
-                                    type: string
-                                    description: User's email address
-                                user_photo:
-                                    type: string
-                                    description: URL to user's photo
-                                interests:
-                                    type: string
-                                    description: User's interests
-        500:
-            description: Internal Server Error
+      200:
+        description: Successfully retrieved all users.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    description: The unique identifier of the user.
+                  username:
+                    type: string
+                    description: The username of the user.
+                  acc_type:
+                    type: string
+                    description: The account type of the user.
+                  full_name:
+                    type: string
+                    description: The full name of the user.
+                  email:
+                    type: string
+                    description: The email address of the user.
+                  user_photo:
+                    type: string
+                    description: The URL to the user's photo.
+                  interests:
+                    type: string
+                    description: The interests of the user.
+      500:
+        description: An internal server error occurred while fetching user data.
     """
     try:
         users = User.query.all()
@@ -109,7 +109,7 @@ def list_users():
 @app.route('/users', methods=['POST'])
 def create_user():
     """
-    Create a new user
+    Create New User
     ---
     requestBody:
         required: true
@@ -118,35 +118,34 @@ def create_user():
                 schema:
                     type: object
                     properties:
-                        user_id:
-                            type: integer
-                            description: The unique identifier for a user                                        
                         username:
                             type: string
-                            description: User's chosen username
+                            description: The user's chosen username.
                         acc_type:
                             type: string
-                            description: Account type (e.g., admin, standard user)
+                            description: The user's account type.
                         full_name:
                             type: string
-                            description: User's full name
+                            description: The user's full name.
                         email:
                             type: string
-                            description: User's email address
+                            description: The user's email address.
                         password:
                             type: string
-                            description: User's password
+                            description: The user's password.
                         user_photo:
                             type: string
-                            description: URL to user's photo
+                            description: URL of the user's photo.
                         interests:
                             type: string
-                            description: User's interests
+                            description: The user's interests.
     responses:
-        201:
-            description: Account created successfully
-        409:
-            description: Email already exists
+      201:
+        description: User successfully created.
+      409:
+        description: Email already exists.
+      500:
+        description: Internal server error occurred while creating the user.
     """
     data = request.json
 
@@ -194,15 +193,15 @@ def create_user():
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     """
-    Update a user's details
+    Update User Details
     ---
     parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            description: The unique identifier for a user
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: integer
+          description: The unique identifier of the user to update.
     requestBody:
         required: true
         content:
@@ -212,27 +211,29 @@ def update_user(user_id):
                     properties:
                         username:
                             type: string
-                            description: User's chosen username
+                            description: New username of the user.
                         acc_type:
                             type: string
-                            description: Account type
+                            description: New account type of the user.
                         full_name:
                             type: string
-                            description: User's full name
+                            description: New full name of the user.
                         email:
                             type: string
-                            description: User's email address
+                            description: New email address of the user.
                         user_photo:
                             type: string
-                            description: URL to user's photo
+                            description: New URL of the user's photo.
                         interests:
                             type: string
-                            description: User's interests
+                            description: New interests of the user.
     responses:
-        200:
-            description: User details updated successfully
-        404:
-            description: User not found
+      200:
+        description: User details updated successfully.
+      404:
+        description: User not found.
+      500:
+        description: Internal server error.
     """
     try:
         user = User.query.get_or_404(user_id)
@@ -261,20 +262,22 @@ def update_user(user_id):
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     """
-    Delete a user
+    Delete User
     ---
     parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            description: The unique identifier for a user
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: integer
+          description: The unique identifier of the user to be deleted.
     responses:
-        200:
-            description: User deleted successfully
-        404:
-            description: User not found
+      200:
+        description: User deleted successfully.
+      404:
+        description: User not found.
+      500:
+        description: Internal server error occurred while attempting to delete the user.
     """
     try:
         user = User.query.get_or_404(user_id)
@@ -299,46 +302,48 @@ def delete_user(user_id):
 @app.route('/users', methods=['GET'])
 def get_user():
     """
-    Get a single user's details
+    Get User Details by User ID
     ---
     parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            description: The unique identifier for a user
+      - in: query
+        name: user_id
+        required: true
+        schema:
+          type: string
+          description: The unique identifier of the user whose details are to be retrieved.
     responses:
-        200:
-            description: User details retrieved successfully
-            content:
-                application/json:
-                    schema:
-                        type: object
-                        properties:
-                            user_id:
-                                type: integer
-                                description: The unique identifier for a user
-                            username:
-                                type: string
-                                description: User's chosen username
-                            acc_type:
-                                type: string
-                                description: Account type
-                            full_name:
-                                type: string
-                                description: User's full name
-                            email:
-                                type: string
-                                description: User's email address
-                            user_photo:
-                                type: string
-                                description: URL to user's photo
-                            interests:
-                                type: string
-                                description: User's interests
-        404:
-            description: User not found
+      200:
+        description: Successfully retrieved user details.
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                    user_id:
+                        type: integer
+                        description: The unique identifier of the user.
+                    username:
+                        type: string
+                        description: The username of the user.
+                    acc_type:
+                        type: string
+                        description: The account type of the user.
+                    full_name:
+                        type: string
+                        description: The full name of the user.
+                    email:
+                        type: string
+                        description: The email address of the user.
+                    user_photo:
+                        type: string
+                        description: The URL to the user's photo.
+                    interests:
+                        type: string
+                        description: The interests of the user.
+      404:
+        description: User not found.
+      500:
+        description: Internal server error occurred while attempting to retrieve the user's details.
     """
     print('FINDING USER!')
     user_id=request.args.get("user_id")
@@ -372,49 +377,50 @@ def get_user():
 @app.route('/users/interests/<string:interests>', methods=['GET'])
 def get_users_by_interests(interests):
     """
-    Get users by interests
+    Get Users by Interests
     ---
     parameters:
-        - in: path
-          name: interests
-          required: true
-          schema:
-            type: string
-            description: User interests to filter by
+      - in: path
+        name: interests
+        required: true
+        schema:
+          type: string
+          description: The interests by which to filter users.
     responses:
-        200:
-            description: Users filtered by interests
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: object
-                            properties:
-                                user_id:
-                                    type: integer
-                                    description: The unique identifier for a user
-                                username:
-                                    type: string
-                                    description: User's chosen username
-                                acc_type:
-                                    type: string
-                                    description: Account type
-                                full_name:
-                                    type: string
-                                    description: User's full name
-                                email:
-                                    type: string
-                                    description: User's email address
-                                user_photo:
-                                    type: string
-                                    description: URL to user's photo
-                                interests:
-                                    type: string
-                                    description: User's interests
-        500:
-            description: Internal Server Error
+      200:
+        description: Successfully retrieved users with specified interests.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                    user_id:
+                        type: integer
+                        description: The unique identifier of the user.
+                    username:
+                        type: string
+                        description: The username of the user.
+                    acc_type:
+                        type: string
+                        description: The account type of the user.
+                    full_name:
+                        type: string
+                        description: The full name of the user.
+                    email:
+                        type: string
+                        description: The email address of the user.
+                    user_photo:
+                        type: string
+                        description: The URL to the user's photo.
+                    interests:
+                        type: string
+                        description: The interests of the user.
+      500:
+        description: Internal server error occurred while attempting to retrieve users by interests.
     """
+
     try:
         interest_list = interests.split(",")
         print(interest_list)
@@ -449,6 +455,35 @@ def get_users_by_interests(interests):
 
 @app.route('/user/payment', methods=['GET'])
 def get_user_payment_info():
+    """
+    Get User Payment Information
+    ---
+    parameters:
+      - in: query
+        name: user_id
+        required: true
+        schema:
+          type: string
+          description: The unique identifier of the user whose payment information is to be retrieved.
+    responses:
+      200:
+        description: Successfully retrieved user payment information.
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                    user_id:
+                        type: integer
+                        description: The unique identifier of the user.
+                    stripe_key:
+                        type: string
+                        description: The Stripe key associated with the user.
+      404:
+        description: User not found.
+      500:
+        description: Internal server error occurred while attempting to retrieve the user's payment information.
+    """
     user_id=request.args.get("user_id")
     print(user_id)
     try:
