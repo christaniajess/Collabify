@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeMount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
 
@@ -8,8 +8,10 @@ const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
+const accountType = ref();
 
 const items = ref();
+
 onMounted(() => {
     bindOutsideClickListener();
     if (!localStorage.id) {
@@ -47,8 +49,16 @@ onMounted(() => {
     }
 });
 
-onBeforeUnmount(() => {
+
+
+onBeforeMount(() => {
     unbindOutsideClickListener();
+    if (localStorage.id) {
+        accountType.value = localStorage.acc_type;
+        console.log(localStorage.acc_type == 'cc');
+    } else {
+        router.push('/login');
+    }
 });
 
 const onTopBarMenuButton = () => {
@@ -102,6 +112,8 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
+            <Chip v-if="accountType == 'cc'" label="Creator" style="margin-right: 1em; font-weight: bold" />
+            <Chip v-else label="Brand" style="margin-right: 1em; font-weight: bold" />
             <Menubar :model="items">
                 <template #item="{ item, props, hasSubmenu }">
                     <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
