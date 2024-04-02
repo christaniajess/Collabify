@@ -7,7 +7,7 @@
 # Project Overview
 
 1. [Project Report & API Docs](https://docs.google.com/document/d/1qe-v97qh0Op3Mk3ixpWzRCELSHMURxqcJao1n8w-aEI/edit)
-2. [Project Slides]()
+2. [Project Slides](https://smu-my.sharepoint.com/:p:/g/personal/muhammadlim_2022_scis_smu_edu_sg/ERqi2dWXyB9GvByIzQPJ-TcBi2VPLSwgefTgUpb4jqM9GA?e=eU6zYl)
 3. [Project Video]()
 
 # Contributors
