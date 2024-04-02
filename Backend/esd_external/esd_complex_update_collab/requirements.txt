@@ -4,3 +4,4 @@ mysql-connector-python==8.3.0
 requests==2.31.0
 flasgger==0.9.7.1
 Flask-Cors==3.0.10
+pika==1.2.0

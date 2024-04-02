@@ -7,7 +7,7 @@ const mailgunAPIKey = process.env.mailgunAPIKey;
 
 const mg = mailgun.client({username: mailgunAPIKeyID, key: mailgunAPIKey});
 
-const sendMail = (req, res, recipients, subject, text) => {
+const sendMail = (recipients, subject, text) => {
 	mg.messages.create(mailgunDomain, {
 		from: "Collabify <mailgun@sandbox-123.mailgun.org>",
 		to: recipients,

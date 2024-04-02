@@ -33,10 +33,9 @@ const check_topic = async (topicName)=> {
   }
 }
 
-const publish_notification = async (req, res) => {
+const publish_notification = async (sender, message, receiver) => {
 
     try {
-        const { sender, message, receiver } = req.body;
         await check_topic(receiver)
         const producer = kafka.producer();
 
@@ -60,9 +59,7 @@ const publish_notification = async (req, res) => {
         console.log("send successfully! ", result);
         await producer.disconnect();
 
-        res.status(200).json({
-            message: "Notification sent!",
-        });
+
     } catch (ex) {
         console.error(`Something bad happened at publish notification ${ex}`);
     }

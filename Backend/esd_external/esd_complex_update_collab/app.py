@@ -5,6 +5,9 @@ from flasgger import Swagger
 from invokes import invoke_http
 from flask_cors import CORS
 import json
+import pika
+import amqp_connection
+
 
 app = Flask(__name__)
 CORS(app)
@@ -16,9 +19,17 @@ app.config['SWAGGER'] = {
 }
 swagger = Swagger(app)
 
-blacklist_URL = "http://host.docker.internal:3005/blacklist"
+
 notification_URL = "http://host.docker.internal:3006"
 collab_URL = "http://host.docker.internal:3001/collaborations"
+
+# notification_URL = "http://localhost:3006"
+# collab_URL = "http://localhost:3001/collaborations"
+
+connection = amqp_connection.create_connection() 
+channel = connection.channel()
+
+
 
 @app.route("/update_request", methods=['PUT'])
 def accept_request():
@@ -87,7 +98,8 @@ def processUpdateRequest(collab):
     print('\n\n-----Invoking collab microservice-----')
     collab_result=invoke_http(collab_URL+"/status" , method="PUT", json=collab)
     code = collab_result["code"]
-    # print('collab_result:', collab_result)
+        
+
     
     if code not in range(200, 300):
         print('collab_result:', collab_result)
@@ -99,25 +111,29 @@ def processUpdateRequest(collab):
     else:
         
         print('\n\n-----Invoking notification microservice-----')
+        
         if (collab_result["data"]["collab_status"]=="Completed"):
             data={
                 "sender": collab_result["data"]["brand_id"],
+                "subject": "Collaboration completed",
                 "message": "Collaboration updated!\nBrand: "+collab_result["data"]["brand_id"]+"\nCollab title: "+collab_result["data"]["collab_title"]+"\nCollab_status: "+collab_result["data"]["collab_status"],
                 "receiver":collab_result["data"]["cc_id"]
             }
-            invoke_http(notification_URL+"/notify", method="POST", json=data)
-            
+            # invoke_http(notification_URL+"/notify", method="POST", json=data)
+            channel.basic_publish(exchange="notification_topic", routing_key="email", body=json.dumps(data), properties=pika.BasicProperties(delivery_mode = 2)) 
+
             
         elif (collab_result["data"]["collab_status"]=="Review"):
             data={
                 "sender": collab_result["data"]["cc_id"],
+                "subject": "Collaboration requires review",
                 "message": "Collaboration updated!\nContent creator: "+collab_result["data"]["cc_id"]+"\nCollab title: "+collab_result["data"]["collab_title"]+"\nCollab_status: "+collab_result["data"]["collab_status"],
                 "receiver":collab_result["data"]["brand_id"]
             }
 
-            invoke_http(notification_URL+"/notification/publish", method="POST", json=data)
-        
-        
+            # invoke_http(notification_URL+"/notification/publish", method="POST", json=data)
+            channel.basic_publish(exchange="notification_topic", routing_key="all", body=json.dumps(data), properties=pika.BasicProperties(delivery_mode = 2)) 
+
 
         return {
             "code": 201,

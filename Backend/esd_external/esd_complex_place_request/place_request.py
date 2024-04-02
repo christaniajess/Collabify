@@ -6,6 +6,9 @@ import requests
 from invokes import invoke_http
 
 import json
+import pika
+import amqp_connection
+
 
 app = Flask(__name__)
 CORS(app)
@@ -21,7 +24,8 @@ swagger = Swagger(app)
 blacklist_URL = "http://host.docker.internal:3005/blacklist"
 notification_URL = "http://host.docker.internal:3006"
 collab_URL = "http://host.docker.internal:3001/collaborations" # changed from collaboration to collaborations
-
+connection = amqp_connection.create_connection() 
+channel = connection.channel()
 
 @app.route("/place_request", methods=['POST'])
 def place_request():
@@ -123,7 +127,8 @@ def processPlaceRequest(collab):
                 "receiver":collab["cc_id"]
             }
 
-            invoke_http(notification_URL+"/notification/publish", method="POST", json=data)
+            # invoke_http(notification_URL+"/notification/publish", method="POST", json=data)
+            channel.basic_publish(exchange="notification_topic", routing_key="all", body=json.dumps(data), properties=pika.BasicProperties(delivery_mode = 2)) 
             
             
 
