@@ -45,14 +45,9 @@ const searchCreators = async () => {
     // Call your search logic/function here
 };
 
-
 const passUserid = (user_id) => {
     localStorage.clickedUserID = user_id;
 };
-
-
-
-
 
 onMounted(() => {
     getAllCreators();
@@ -77,13 +72,13 @@ onMounted(() => {
                     </template>
                     <template #title>
                         {{ creator.full_name }}
-                        <Badge value="" severity="secondary">{{ creator.acc_type === 'cc' ? 'Creator' : '' }}</Badge>
+                        <Badge value="" severity="contrast">{{ creator.acc_type === 'cc' ? 'Creator' : '' }}</Badge>
                     </template>
                     <template #subtitle>Interests</template>
                     <template #content>
-                        <p class="m-0">
-                            {{ creator.interests }}
-                        </p>
+                        <div class="flex align-items-center">
+                            <Chip v-for="interest in creator.interests.split(',')" :label="interest" />
+                        </div>
                     </template>
 
                     <template #footer>
