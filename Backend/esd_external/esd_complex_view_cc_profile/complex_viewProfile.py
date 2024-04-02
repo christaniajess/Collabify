@@ -27,21 +27,21 @@ ERROR_URL = "http://host.docker.internal:5005/error"
 @app.route("/profile", methods=['GET'])
 def get_profile():
     """
-    Get a Comprehensive Profile View
+    Get Comprehensive Profile View
     ---
-    parameters:
-      - in: requestBody
-        name: cc_id
+    requestBody:
         required: true
-        schema:
-          type: object
-          properties:
-            cc_id:
-              type: integer
-          description: The unique identifier of the content creator for whom the profile is fetched.
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        cc_id:
+                            type: string
+                            description: The unique identifier of the content creator whose comprehensive profile view is being requested.
     responses:
       200:
-        description: Successfully retrieved the comprehensive profile view, including account details, collaborations, reviews, and projects.
+        description: Successfully retrieved the comprehensive profile view, including account details, reviews, collaborations, and projects.
         content:
           application/json:
             schema:
@@ -53,34 +53,82 @@ def get_profile():
                   properties:
                     user_id:
                       type: integer
-                      description: The unique identifier of the content creator.
+                      description: The unique identifier of the user.
                     username:
                       type: string
-                      description: The username of the content creator.
-                    # Additional account properties...
+                      description: The username of the user.
+                    acc_type:
+                      type: string
+                      description: The account type of the user.
+                    full_name:
+                      type: string
+                      description: The full name of the user.
+                    email:
+                      type: string
+                      description: The email address of the user.
+                    user_photo:
+                      type: string
+                      description: The URL to the user's photo.
+                    interests:
+                      type: string
+                      description: The interests of the user.
                 collab:
                   type: array
-                  description: A list of collaborations associated with the content creator.
+                  description: Collaborations associated with the content creator.
                   items:
                     type: object
-                    # Define the schema for a single collaboration...
+                    properties:
+                      cc_id:
+                        type: string
+                      brand_id:
+                        type: string
+                      collab_title:
+                        type: string
+                      collab_status:
+                        type: string
                 review:
                   type: array
-                  description: A list of reviews given to the content creator.
+                  description: Reviews given to the content creator.
                   items:
                     type: object
-                    # Define the schema for a single review...
+                    properties:
+                      review_id:
+                        type: integer
+                      cc_id:
+                        type: integer
+                      brand_id:
+                        type: integer
+                      rating:
+                        type: integer
+                      title:
+                        type: string
+                      content:
+                        type: string
+                      timestamp:
+                        type: string
+                        format: date-time
                 project:
                   type: array
-                  description: A list of projects created by the content creator.
+                  description: Projects created by the content creator.
                   items:
                     type: object
-                    # Define the schema for a single project...
-      400:
-        description: Invalid JSON input or missing required query parameter `cc_id`.
+                    properties:
+                      proj_id:
+                        type: integer
+                      user_id:
+                        type: string
+                      proj_name:
+                        type: string
+                      proj_image:
+                        type: string
+                      proj_description:
+                        type: string
+      404:
+        description: Content creator profile not found.
       500:
-        description: Internal server error or unable to fetch from external services.
+        description: Internal server error due to issues with microservice communication or unexpected errors.
     """
+
     # Simple check of input format and data of the request are JSON
     try:
       

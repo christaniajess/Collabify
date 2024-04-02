@@ -52,7 +52,7 @@ class Review(db.Model):
 @app.route("/reviews", methods=['POST'])
 def create_review():
     """
-    Create a new review
+    Create a New Review
     ---
     requestBody:
         required: true
@@ -63,28 +63,24 @@ def create_review():
                     properties:
                         cc_id:
                             type: integer
-                            description: The unique identifier of the content creator being reviewed.
+                            description: Content creator's unique identifier.
                         brand_id:
                             type: integer
-                            description: The unique identifier of the brand posting the review.
+                            description: Brand's unique identifier.
                         rating:
                             type: integer
-                            description: The rating given to the content creator by the brand.
+                            description: Rating given to the content creator.
                         title:
                             type: string
-                            description: The title of the review.
+                            description: Title of the review.
                         content:
                             type: string
-                            description: The detailed content of the review.
+                            description: Detailed content of the review.
     responses:
-        201:
-            description: Review successfully created. Returns the details of the newly added review.
-            content:
-                application/json:
-                    schema:
-                        $ref: '#/components/schemas/Review'
-        500:
-            description: An error occurred creating the review. Check the error details.
+      201:
+        description: Review successfully created.
+      500:
+        description: An error occurred creating the review.
     """
     data = request.get_json()
     new_review = Review(**data)
@@ -99,26 +95,20 @@ def create_review():
 @app.route("/reviews/<int:cc_id>", methods=['GET'])
 def get_reviews_by_content_creator(cc_id):
     """
-    Get reviews by content creator ID
+    Get Reviews by Content Creator ID
     ---
     parameters:
-        - in: path
-          name: cc_id
-          required: true
-          schema:
-            type: integer
-            description: The unique identifier of the content creator for whom reviews are being retrieved.
+      - in: path
+        name: cc_id
+        required: true
+        schema:
+          type: integer
+          description: Content creator's unique identifier for whom reviews are being queried.
     responses:
-        200:
-            description: Successfully retrieved an array of reviews for the specified content creator.
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            $ref: '#/components/schemas/Review'
-        404:
-            description: No reviews found for the specified content creator.
+      200:
+        description: Successfully retrieved reviews for the specified content creator.
+      404:
+        description: No reviews found for the specified content creator.
     """
     reviews_query = db.session.query(Review).filter(Review.cc_id == cc_id).all()
     if reviews_query:
@@ -132,15 +122,15 @@ def get_reviews_by_content_creator(cc_id):
 @app.route("/reviews/<int:review_id>", methods=['PUT'])
 def update_review(review_id):
     """
-    Update a review
+    Update an Existing Review
     ---
     parameters:
-        - in: path
-          name: review_id
-          required: true
-          schema:
-            type: integer
-            description: The unique identifier of the review to be updated.
+      - in: path
+        name: review_id
+        required: true
+        schema:
+          type: integer
+          description: Unique identifier of the review to be updated.
     requestBody:
         required: true
         content:
@@ -150,7 +140,7 @@ def update_review(review_id):
                     properties:
                         rating:
                             type: integer
-                            description: Updated rating for the review.
+                            description: Updated rating.
                         title:
                             type: string
                             description: Updated title of the review.
@@ -158,12 +148,10 @@ def update_review(review_id):
                             type: string
                             description: Updated detailed content of the review.
     responses:
-        200:
-            description: Review successfully updated. Returns the updated details of the review.
-        404:
-            description: Review not found. The specified review ID does not exist.
-        500:
-            description: An internal server error occurred while updating the review.
+      200:
+        description: Review successfully updated.
+      404:
+        description: Review not found.
     """
     review_query = db.session.scalars(db.select(Review).filter_by(review_id=review_id)).first()
     if review_query:
@@ -178,22 +166,20 @@ def update_review(review_id):
 @app.route("/reviews/<int:review_id>", methods=['DELETE'])
 def delete_review(review_id):
     """
-    Delete a review
+    Delete a Review
     ---
     parameters:
-        - in: path
-          name: review_id
-          required: true
-          schema:
-            type: integer
-            description: The unique identifier of the review to be deleted.
+      - in: path
+        name: review_id
+        required: true
+        schema:
+          type: integer
+          description: Unique identifier of the review to be deleted.
     responses:
-        200:
-            description: Review successfully deleted.
-        404:
-            description: Review not found. The specified review ID does not exist.
-        500:
-            description: An internal server error occurred while deleting the review.
+      200:
+        description: Review successfully deleted.
+      404:
+        description: Review not found.
     """
     review_query = db.session.scalars(db.select(Review).filter_by(review_id=review_id)).first()
     if review_query:

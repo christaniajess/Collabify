@@ -37,22 +37,24 @@ def place_request():
                     properties:
                         cc_id:
                             type: string
-                            description: The unique identifier of the content creator being requested for collaboration.
+                            description: The unique identifier of the content creator with whom the collaboration is requested.
                         brand_id:
                             type: string
                             description: The unique identifier of the brand initiating the collaboration request.
                         details:
                             type: string
-                            description: Details of the collaboration request.
+                            description: The details of the collaboration request.
     responses:
-        201:
-            description: Collaboration request successfully placed. Notification sent to the content creator.
-        403:
-            description: The brand is blacklisted from requesting collaborations with this content creator.
-        400:
-            description: Invalid JSON input provided.
-        500:
-            description: Internal server error. Error occurred in the collaboration request process.
+      201:
+        description: Collaboration request successfully placed and notification sent.
+      400:
+        description: Invalid JSON input.
+      403:
+        description: The brand is blacklisted from requesting collaborations with this content creator.
+      409:
+        description: Collaboration request already exists between the specified brand and content creator.
+      500:
+        description: Internal server error. Could be due to issues with microservice communication or unexpected server errors.
     """
     if request.is_json:
         try:

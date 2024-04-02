@@ -37,22 +37,22 @@ def accept_request():
                             description: The unique identifier of the content creator involved in the collaboration.
                         brand_id:
                             type: string
-                            description: The unique identifier of the brand requesting the collaboration.
+                            description: The unique identifier of the brand initiating the collaboration.
                         collab_title:
                             type: string
-                            description: The title of the collaboration project.
+                            description: The title of the collaboration being updated.
                         collab_status:
                             type: string
-                            description: The new status of the collaboration (e.g., 'accepted', 'rejected').
+                            description: The new status of the collaboration (e.g., "Completed", "Review").
     responses:
-        201:
-            description: Collaboration request successfully updated. Notification sent to relevant parties.
-        404:
-            description: Collaboration request not found. Indicates an invalid request or nonexistent collaboration.
-        400:
-            description: Invalid JSON input. Indicates that the request body did not contain the expected JSON format.
-        500:
-            description: Internal server error. Indicates a failure within the server processing the request.
+      201:
+        description: Collaboration request successfully updated. Notifications sent to relevant parties if applicable.
+      400:
+        description: Invalid JSON input.
+      404:
+        description: Collaboration request not found.
+      500:
+        description: Internal server error. Could be due to issues with microservice communication or unexpected server errors.
     """
     if request.is_json:
         try:

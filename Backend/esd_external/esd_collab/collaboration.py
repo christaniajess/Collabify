@@ -46,38 +46,32 @@ class Collaboration(db.Model):
 @app.route("/collaborations", methods=['GET'])
 def get_all_collaborations():
     """
-    List all collaborations
+    List All Collaborations
     ---
     responses:
-        200:
-            description: A list of collaborations
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: object
-                            properties:
-                                cc_id:
-                                    type: string
-                                    description: Content creator ID
-                                cc_name:
-                                    type: string
-                                    description: Content creator name
-                                brand_id:
-                                    type: string
-                                    description: Brand ID
-                                brand_name:
-                                    type: string
-                                    description: Brand name
-                                collab_title:
-                                    type: string
-                                    description: Title of the collaboration
-                                collab_status:
-                                    type: string
-                                    description: Status of the collaboration
-        404:
-            description: No collaborations found
+      200:
+        description: Successfully retrieved a list of all collaborations.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  cc_id:
+                    type: string
+                    description: The unique identifier of the content creator.
+                  brand_id:
+                    type: string
+                    description: The unique identifier of the brand.
+                  collab_title:
+                    type: string
+                    description: The title of the collaboration.
+                  collab_status:
+                    type: string
+                    description: The current status of the collaboration.
+      404:
+        description: No collaborations found.
     """
     collaboration_list = db.session.scalars(db.select(Collaboration)).all()
     if len(collaboration_list):
@@ -100,44 +94,35 @@ def get_all_collaborations():
 @app.route("/collaborations/cc/<string:cc_id>", methods=['GET'])
 def get_collaborations_by_cc(cc_id):
     """
-    Get collaboration by content creator ID
+    Get Collaborations by Content Creator ID
     ---
     parameters:
-        - in: path
-          name: cc_id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: cc_id
+        required: true
+        schema:
+          type: string
+          description: The unique identifier of the content creator whose collaborations are being queried.
     responses:
-        200:
-            description: Collaboration details by content creator ID
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: object
-                            properties:
-                                cc_id:
-                                    type: string
-                                    description: Content creator ID
-                                cc_name:
-                                    type: string
-                                    description: Content creator name
-                                brand_id:
-                                    type: string
-                                    description: Brand ID
-                                brand_name:
-                                    type: string
-                                    description: Brand name
-                                collab_title:
-                                    type: string
-                                    description: Title of the collaboration
-                                collab_status:
-                                    type: string
-                                    description: Status of the collaboration
-        404:
-            description: Collaboration not found
+      200:
+        description: Successfully retrieved collaborations for the specified content creator.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  cc_id:
+                    type: string
+                  brand_id:
+                    type: string
+                  collab_title:
+                    type: string
+                  collab_status:
+                    type: string
+      404:
+        description: Collaborations not found for the specified content creator.
     """
     collaborations = db.session.scalars(
         db.select(Collaboration).filter_by(cc_id=cc_id)).all()
@@ -166,44 +151,35 @@ def get_collaborations_by_cc(cc_id):
 @app.route("/collaborations/status/<string:collab_status>", methods=["GET"])
 def get_collaboration_by_status(collab_status):
     """
-    Get collaborations by status
+    Get Collaborations by Status
     ---
     parameters:
-        - in: path
-          name: collab_status
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: collab_status
+        required: true
+        schema:
+          type: string
+          description: The status to filter collaborations by.
     responses:
-        200:
-            description: Collaboration data with the specified status
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: object
-                            properties:
-                                cc_id:
-                                    type: string
-                                    description: Content creator ID
-                                cc_name:
-                                    type: string
-                                    description: Content creator name
-                                brand_id:
-                                    type: string
-                                    description: Brand ID
-                                brand_name:
-                                    type: string
-                                    description: Brand name
-                                collab_title:
-                                    type: string
-                                    description: Title of the collaboration
-                                collab_status:
-                                    type: string
-                                    description: Status of the collaboration
-        404:
-            description: Collaboration with the specified status not found
+      200:
+        description: Successfully retrieved collaborations with the specified status.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  cc_id:
+                    type: string
+                  brand_id:
+                    type: string
+                  collab_title:
+                    type: string
+                  collab_status:
+                    type: string
+      404:
+        description: No collaborations found with the specified status.
     """
     collabs = db.session.scalars(
         db.select(Collaboration).filter_by(collab_status=collab_status)).all()
@@ -229,44 +205,35 @@ def get_collaboration_by_status(collab_status):
 @app.route("/collaborations/brand/<string:brand_id>", methods=["GET"])
 def get_collaboration_by_brand(brand_id):
     """
-    Get collaboration by brand ID
+    Get Collaboration by Brand ID
     ---
     parameters:
-        - in: path
-          name: brand_id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: brand_id
+        required: true
+        schema:
+          type: string
+          description: The unique identifier of the brand whose collaborations are being queried.
     responses:
-        200:
-            description: Collaboration data for the specified brand
-            content:
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: object
-                            properties:
-                                cc_id:
-                                    type: string
-                                    description: Content creator ID
-                                cc_name:
-                                    type: string
-                                    description: Content creator name
-                                brand_id:
-                                    type: string
-                                    description: Brand ID
-                                brand_name:
-                                    type: string
-                                    description: Brand name
-                                collab_title:
-                                    type: string
-                                    description: Title of the collaboration
-                                collab_status:
-                                    type: string
-                                    description: Status of the collaboration
-        404:
-            description: Collaboration not found
+      200:
+        description: Successfully retrieved collaborations for the specified brand.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  cc_id:
+                    type: string
+                  brand_id:
+                    type: string
+                  collab_title:
+                    type: string
+                  collab_status:
+                    type: string
+      404:
+        description: Collaborations not found for the specified brand.
     """
     collabs = db.session.scalars(
         db.select(Collaboration).filter_by(brand_id=brand_id)).all()
@@ -293,7 +260,7 @@ def get_collaboration_by_brand(brand_id):
 @app.route("/collaborations", methods=["POST"])
 def create_collaboration():
     """
-    Create a new collaboration
+    Create a New Collaboration
     ---
     requestBody:
         required: true
@@ -304,27 +271,21 @@ def create_collaboration():
                     properties:
                         cc_id:
                             type: string
-                            description: Content creator ID
-                        cc_name:
-                            type: string
-                            description: Content creator name
+                            description: The unique identifier of the content creator.
                         brand_id:
                             type: string
-                            description: Brand ID
-                        brand_name:
-                            type: string
-                            description: Brand name
+                            description: The unique identifier of the brand.
                         collab_title:
                             type: string
-                            description: Title of the collaboration
+                            description: The title of the collaboration.
                         collab_status:
                             type: string
-                            description: Status of the collaboration
+                            description: The initial status of the collaboration.
     responses:
-        201:
-            description: Collaboration created successfully
-        500:
-            description: Error creating collaboration
+      201:
+        description: Collaboration created successfully.
+      500:
+        description: An error occurred while creating the collaboration.
     """
     try: 
         data = request.get_json()
@@ -355,39 +316,32 @@ def create_collaboration():
 @app.route("/collaborations/status", methods=["PUT"])
 def update_collaboration_status():
     """
-    Update collaboration status
+    Update Collaboration Status
     ---
     requestBody:
         required: true
         content:
             application/json:
                 schema:
-                type: object
-                properties:
-                    cc_id:
-                        type: string
-                        description: Content creator ID
-                    cc_name:
-                        type: string
-                        description: Content creator name
-                    brand_id:
-                        type: string
-                        description: Brand ID
-                    brand_name:
-                        type: string
-                        description: Brand name
-                    collab_status:
-                        type: string
-                        description: Status of the collaboration
+                    type: object
+                    properties:
+                        cc_id:
+                            type: string
+                            description: The unique identifier of the content creator involved in the collaboration.
+                        brand_id:
+                            type: string
+                            description: The unique identifier of the brand involved in the collaboration.
+                        collab_status:
+                            type: string
+                            description: The new status of the collaboration.
     responses:
-        200:
-            description: Collaboration status updated successfully
-        404:
-            description: Collaboration not found
-        500:
-            description: Error updating collaboration status
+      200:
+        description: Collaboration status updated successfully.
+      404:
+        description: Collaboration not found.
+      500:
+        description: An error occurred while updating the collaboration status.
     """
-    
     data=request.get_json()
     print(data)
     collabs = db.session.scalars(
@@ -430,26 +384,26 @@ def update_collaboration_status():
 @app.route("/collaborations", methods=["DELETE"])
 def remove_collaboration():
     """
-    Remove collaboration by content creator ID and brand ID
+    Remove Collaboration
     ---
-    parameters:
-        - in: path
-            name: cc_id
-            required: true
-            schema:
-            type: string
-        - in: path
-            name: brand_id
-            required: true
-            schema:
-            type: string
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        cc_id:
+                            type: string
+                            description: The unique identifier of the content creator involved in the collaboration.
+                        brand_id:
+                            type: string
+                            description: The unique identifier of the brand involved in the collaboration.
     responses:
-        200:
-            description: Collaboration removed successfully
-        404:
-            description: Collaboration not found
-        500:
-            description: Error removing collaboration
+      200:
+        description: Collaboration removed successfully.
+      404:
+        description: Collaboration not found.
     """
     cc_id = request.json["cc_id"]
     brand_id=request.json["brand_id"]
