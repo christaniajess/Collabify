@@ -45,7 +45,7 @@ services:
     restart: always
     environment:
     # to change
-      internalService: "192.168.192.146"
+      internalService: "172.28.182.145"
     ports:
       - 3004:5100
 
@@ -76,7 +76,7 @@ services:
     restart: always
     environment:
     # to change
-      internalService: "192.168.192.146"
+      internalService: "172.28.182.145"
 
     ports:
       - 3009:5100
@@ -98,7 +98,7 @@ services:
     restart: always
     environment:
     # to change
-      internalService: "192.168.192.146"
+      internalService: "172.28.182.145"
     ports:
       - 3012:5100
 
