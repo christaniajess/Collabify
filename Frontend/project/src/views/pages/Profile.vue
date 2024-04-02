@@ -47,8 +47,8 @@ const responsiveOptions = ref([
 
 // clickedUserID
 onBeforeMount(() => {
-    if (localStorage.clickedUserID) {
-        account.value = localStorage.clickedUserID;
+    if (localStorage.id) {
+        account.value = localStorage.id;
     } else {
         console.log('No clicked user ID');
     }
@@ -88,7 +88,7 @@ const getCCProfile = async (user_id) => {
 
 const getAccountImage = async (user_id) => {
     try {
-        console.log(111)
+        console.log(111);
         const response = await axios.get(MicroService['service'] + Ports['account'] + '/users?user_id=' + user_id);
 
         accountPhoto.value = response.data.data.user_photo;
@@ -135,7 +135,7 @@ onMounted(async () => {
                             {{ accountDetails.full_name }}
                         </span>
                     </div>
-                    <Chip label="CREATOR" />
+                    <Chip label="Creator" style="font-weight: bold" />
                 </div>
             </div>
 
@@ -145,7 +145,6 @@ onMounted(async () => {
                 <h5>{{ accountDetails.full_name }}'s Projects</h5>
 
                 <div class="card">
-
                     <Carousel v-if="!Array.isArray(projectDetails.value)" :value="projectDetails" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions" circular :autoplayInterval="5000">
                         <template #item="slotProps">
                             <div class="border-1 surface-border border-round m-2 p-3">

@@ -170,7 +170,7 @@ onMounted(async () => {
                             <span class="m-0 ml-2 p-0 font-light">{{ collaborationDetails.length }} Collaborations</span>
                         </div>
                     </div>
-                    <Chip label="CREATOR" />
+                    <Chip label="Creator" style="font-weight: bold;"/>
                 </div>
 
                 <div class="flex align-items-start flex-column lg:justify-content-between lg:flex-row mt-2">
