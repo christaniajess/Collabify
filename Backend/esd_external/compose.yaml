@@ -154,6 +154,8 @@ services:
       - kafka-net
     ports:
       - 3006:3000
+    depends_on:
+      - rabbitmq-mgmt
 
   rabbitmq-mgmt :
     image: rabbitmq:3-management

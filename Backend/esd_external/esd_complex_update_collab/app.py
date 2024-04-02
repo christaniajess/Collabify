@@ -20,11 +20,8 @@ app.config['SWAGGER'] = {
 swagger = Swagger(app)
 
 
-notification_URL = "http://host.docker.internal:3006"
 collab_URL = "http://host.docker.internal:3001/collaborations"
 
-# notification_URL = "http://localhost:3006"
-# collab_URL = "http://localhost:3001/collaborations"
 
 connection = amqp_connection.create_connection() 
 channel = connection.channel()

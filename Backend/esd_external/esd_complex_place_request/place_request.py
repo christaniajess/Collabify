@@ -22,7 +22,6 @@ app.config['SWAGGER'] = {
 swagger = Swagger(app)
 
 blacklist_URL = "http://host.docker.internal:3005/blacklist"
-notification_URL = "http://host.docker.internal:3006"
 collab_URL = "http://host.docker.internal:3001/collaborations" # changed from collaboration to collaborations
 connection = amqp_connection.create_connection() 
 channel = connection.channel()
