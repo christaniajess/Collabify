@@ -1,3 +1,23 @@
+/**
+ * @swagger
+ * /notification/consume:
+ *   get:
+ *     summary: Retrieve a notification
+ *     description: Retrieve a notification message from a specified topic.
+ *     parameters:
+ *       - in: query
+ *         name: topic
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The topic (follows user_id) from which the message will be retrieved.
+ *     responses:
+ *       200:
+ *         description: Notification successfully retrieved from the topic.
+ *       400:
+ *         description: Error retrieving notification.
+ */
+
 const express=require("express");
 const {  publish_notification, consume_notification } = require("../controller/notificationController");
 const mailgunDomain = process.env.mailgunDomain;

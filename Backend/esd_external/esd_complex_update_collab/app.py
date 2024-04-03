@@ -15,7 +15,7 @@ app.config['SWAGGER'] = {
     'title': 'Update Collaboration Complex Microservice API',
     'version': '1.0',
     'openapi': '3.0.2',
-    'description': 'View content creator profiles'
+    'description': 'Update a collaboration request and notify relevant parties'
 }
 swagger = Swagger(app)
 
