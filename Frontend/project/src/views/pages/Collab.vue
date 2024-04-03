@@ -61,7 +61,7 @@ const getCollabInfo = async () => {
     }
 };
 
-const update_status = async (brand_id, status = false) => {
+const update_status = async (brand_id, collab_title, status = false) => {
     try {
         var update_collab_status;
         if (status) {
@@ -72,7 +72,8 @@ const update_status = async (brand_id, status = false) => {
         let data = {
             cc_id: account.value,
             brand_id: brand_id,
-            collab_status: update_collab_status
+            collab_status: update_collab_status,
+            collab_title: collab_title
         };
 
         console.log(data);
@@ -108,11 +109,12 @@ const setBlacklist = async (brand_id) => {
 
 const payment = async (brand_id, collab_title, pay_amount) => {
     try {
+        console.log(collab_title,1111)
         const response = await axios.post(MicroService['service'] + Ports['complex_brand_close_collab'] + '/close_collab', {
             cc_id: brand_id,
             brand_id: account.value,
             collab_title: collab_title,
-            amount: pay_amount
+            amount: pay_amount,
         });
 
         console.log(response.data);
@@ -215,7 +217,7 @@ const initFilters = () => {
                                             severity="danger"
                                             label="Update"
                                             @click="
-                                                update_status(slotProps.data.brand_id);
+                                                update_status(slotProps.data.brand_id, slotProps.data.collab_title);
                                                 slotProps.data.edit_visible = false;
                                                 selectedStatus.value = null;
                                             "
@@ -328,7 +330,7 @@ const initFilters = () => {
                                             severity="danger"
                                             label="Accept"
                                             @click="
-                                                update_status(slotProps.data.brand_id, 'In-progress');
+                                                update_status(slotProps.data.brand_id, slotProps.data.collab_title, 'In-progress');
                                                 slotProps.data.edit_visible = false;
                                             "
                                         ></Button>

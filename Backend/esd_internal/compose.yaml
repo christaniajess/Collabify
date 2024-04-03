@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
     environment:
       # to change
-      externalService: "192.168.192.146" #  declaration using - externalService didn't work, so changed to this. 
+      externalService: "172.28.110.113" #  declaration using - externalService didn't work, so changed to this. 
     restart: always
     ports:
       - 3008:5000

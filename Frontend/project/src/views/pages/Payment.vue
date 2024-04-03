@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const brand_id = ref();
 const cc_id = ref();
-
+const collab_title = ref();
 const paymentProcess = () => {
     fetch(MicroService['service'] + Ports['complex_update_collab'] + '/update_request', {
         method: 'PUT',
@@ -16,7 +16,8 @@ const paymentProcess = () => {
         body: JSON.stringify({
             brand_id: brand_id.value,
             cc_id: cc_id.value,
-            collab_status: 'Completed'
+            collab_status: 'Completed',
+            collab_title: collab_title.value
         })
     })
         .then((res) => {
@@ -40,6 +41,7 @@ onMounted(async () => {
     console.log(urlParams.value);
     brand_id.value = urlParams.value['brand_id'];
     cc_id.value = urlParams.value['cc_id'];
+    collab_title.value = urlParams.value['collab_title'];
     console.log(brand_id.value, cc_id.value);
     await paymentProcess();
 });

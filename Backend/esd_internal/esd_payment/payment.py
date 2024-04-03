@@ -3,7 +3,7 @@ import stripe
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flasgger import Swagger
-
+import urllib
 app = Flask(__name__)
 CORS(app)
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
@@ -88,6 +88,7 @@ def create_checkout_session():
 
         cc_id=data["cc_id"]
         brand_id=data["brand_id"]
+        collab_title=data["collab_title"]
         # storeItems = {1: {"priceInCents": 10000, "name": "Nike Collab"}}
         session = stripe.checkout.Session.create(
             payment_method_types=["card"],
@@ -96,7 +97,7 @@ def create_checkout_session():
                 {
                     "price_data": {
                         "currency": "sgd",
-                        "product_data": {"name": item["collab_title"]},
+                        "product_data": {"name": collab_title},
                         "unit_amount": item["amount"],
                     },
                     "quantity": item["quantity"],
@@ -105,7 +106,7 @@ def create_checkout_session():
             ],
             # success_url=f"{os.environ.get('CLIENT_URL')}",
             # cancel_url=f"{os.environ.get('CLIENT_URL')}/Collab"
-            success_url=f"{os.environ.get('webServerURL')}/Payment?cc_id="+str(cc_id)+"&brand_id="+str(brand_id),
+            success_url=f"{os.environ.get('webServerURL')}/Payment?cc_id={cc_id}&brand_id={brand_id}&collab_title={urllib.parse.quote(collab_title)}",
             cancel_url=f"{os.environ.get('webServerURL')}",
         )
         print(2)

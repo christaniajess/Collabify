@@ -150,15 +150,14 @@ def get_profile_data(details):
         json={
             "items": [
                 {
-                    "collab_title": details["collab_title"],
                     "amount": details["amount"],
                     "quantity": 1,
                 }
             ],
             "stripe_key": stripe_key,
             "brand_id": details["brand_id"],
-            "cc_id":details["cc_id"],
-            
+            "cc_id": details["cc_id"],
+            "collab_title": details["collab_title"],
         },
     )
 

@@ -345,7 +345,7 @@ def update_collaboration_status():
     data=request.get_json()
     print(data)
     collabs = db.session.scalars(
-        db.select(Collaboration).filter_by(cc_id=data["cc_id"],brand_id=data["brand_id"])).first()
+        db.select(Collaboration).filter_by(cc_id=data["cc_id"],brand_id=data["brand_id"],collab_title=data['collab_title'])).first()
     if collabs:
         try:
             collabs.collab_status = data["collab_status"]
