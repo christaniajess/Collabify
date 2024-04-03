@@ -68,6 +68,14 @@
 4. Run `npm run dev` to run the vue
 5. copy paste the url from the terminal to the browser
 
+## Filling in Payment Details
+
+1. Email: `<input any email in recognised format>`
+2. Card number: `4242 4242 4242 4242`
+3. Month: `04/24`
+4. CVC: `424`
+5. Name: `<input any>`
+
 ## License
 
 This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
