@@ -129,7 +129,7 @@ def processUpdateRequest(collab):
             }
 
             # invoke_http(notification_URL+"/notification/publish", method="POST", json=data)
-            channel.basic_publish(exchange="notification_topic", routing_key="all", body=json.dumps(data), properties=pika.BasicProperties(delivery_mode = 2)) 
+            channel.basic_publish(exchange="notification_topic", routing_key="kafka", body=json.dumps(data), properties=pika.BasicProperties(delivery_mode = 2)) 
 
 
         return {
