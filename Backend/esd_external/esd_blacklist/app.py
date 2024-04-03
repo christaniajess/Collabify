@@ -43,26 +43,6 @@ def home():
 
 @app.route("/blacklist/all")
 def get_all():
-    blacklist = db.session.scalars(db.select(Blacklist)).all()
-    if len(blacklist):
-        return jsonify(
-            {
-                "code": 200,
-                "data": {
-                    "records": [record.json() for record in blacklist]
-                }
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no blacklists."
-        }
-    ), 404
-
-
-@app.route("/blacklist")
-def find_by_account():
     """
     Get All Blacklist Records
     ---
@@ -89,28 +69,26 @@ def find_by_account():
       404:
         description: There are no blacklists found.
     """
-    account = request.args.get('account')   
-    print(account)
-    blacklist = db.session.scalars(db.select(Blacklist).filter_by(account=account)).all()
-
-    if blacklist:
+    blacklist = db.session.scalars(db.select(Blacklist)).all()
+    if len(blacklist):
         return jsonify(
             {
                 "code": 200,
-                "data": [record.json() for record in blacklist]
-                
+                "data": {
+                    "records": [record.json() for record in blacklist]
+                }
             }
         )
     return jsonify(
         {
             "code": 404,
-            "message": "blacklist not found."
+            "message": "There are no blacklists."
         }
     ), 404
-    
-    
-@app.route("/blacklist", methods=['POST'])
-def create_blacklist():
+
+
+@app.route("/blacklist")
+def find_by_account():
     """
     Find Blacklist Record by Account
     ---
@@ -141,6 +119,96 @@ def create_blacklist():
       404:
         description: Blacklist records not found for the specified account.
     """
+    account = request.args.get('account')   
+    print(account)
+    blacklist = db.session.scalars(db.select(Blacklist).filter_by(account=account)).all()
+
+    if blacklist:
+        return jsonify(
+            {
+                "code": 200,
+                "data": [record.json() for record in blacklist]
+                
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "blacklist not found."
+        }
+    ), 404
+    
+    
+@app.route("/blacklist", methods=['POST'])
+def create_blacklist():
+    """
+    Create a Blacklist Record
+    ---
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        account:
+                            type: string
+                            description: The account ID of the user creating the blacklist record.
+                        banned_account:
+                            type: string
+                            description: The account ID of the banned user to be added to the blacklist.
+    responses:
+      201:
+        description: Blacklist record successfully created.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account:
+                  type: string
+                  description: The account ID of the user.
+                banned_account:
+                  type: string
+                  description: The account ID of the banned user.
+                date:
+                  type: string
+                  format: date-time
+                  description: The date and time when the blacklist record was created.
+      400:
+        description: Blacklist record already exists.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account:
+                  type: string
+                  description: The account ID of the user.
+                banned_account:
+                  type: string
+                  description: The account ID of the banned user.
+                message:
+                  type: string
+                  description: Error message indicating that the blacklist record already exists.
+      500:
+        description: An error occurred creating the blacklist record.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account:
+                  type: string
+                  description: The account ID of the user.
+                banned_account:
+                  type: string
+                  description: The account ID of the banned user.
+                message:
+                  type: string
+                  description: Error message indicating that an error occurred creating the blacklist record.
+    """
+
     data = request.get_json()["data"]
     account = data['account']
     banned_account = data['banned_account']
