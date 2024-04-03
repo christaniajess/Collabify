@@ -144,9 +144,8 @@ services:
     restart: always
     hostname: notification
     environment:
-      mailgunDomain: sandbox3830718b42d748999166ceb664223250.mailgun.org
-      mailgunAPIKeyID: 4c205c86-023f941d
-      mailgunAPIKey: 1d656920fa2a6e77f0bc70d7ec94b3b8-4c205c86-023f941d
+      # to change
+      
     build:
       context: ./esd_kafka
       dockerfile: Dockerfile
