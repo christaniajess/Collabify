@@ -2,6 +2,8 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const amqp = require('amqplib/callback_api');
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 const { email_notification } = require("./controller/emailController");
 const { publish_notification } = require("./controller/notificationController");
@@ -15,6 +17,31 @@ app.use(cors()); // Allows cross-origin requests
 app.use(express.json());
 app.use("/email", require("./routers/emailRouter"));
 app.use("/notification", require("./routers/notificationRouter"));
+
+const options = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "Notification Service",
+            version: "1.0.0",
+            description: "A simple notification service",
+        },
+        servers: [
+            {
+                url: "http://localhost:3000",
+            },
+        ],
+    },
+    apis: ["./routers/*.js"],
+};
+
+const specs = swaggerJsdoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.get('/docs.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(specs);
+}
+);
 
 const server = http.createServer(app);
 

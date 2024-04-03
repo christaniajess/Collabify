@@ -10,10 +10,10 @@ app = Flask(__name__)
 CORS(app)
 
 app.config["SWAGGER"] = {
-    "title": "View Profile Complex Microservice API",
+    "title": "Close Collaboration Complex Microservice API",
     "version": "1.0",
     "openapi": "3.0.2",
-    "description": "View content creator profiles",
+    "description": "Close a collaboration and initiate payment processing.",
 }
 swagger = Swagger(app)
 

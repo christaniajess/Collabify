@@ -17,6 +17,8 @@
     "kafkajs": "^1.16.0",
     "mailgun.js": "^10.2.1",
     "nodemon": "^3.1.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "uuid": "^9.0.1"
   }
 }
