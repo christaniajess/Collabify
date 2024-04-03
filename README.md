@@ -54,7 +54,7 @@
 
 #### Running the External and Internal yaml file
 
-1. Edit the internal and external compose.yaml file and change the ip addresses to the ip address from Zerotier VPN according to the machine hosting esd_internal and esd_external
+1. Edit the internal and external compose.yaml file and change the ip addresses to the ip address according to the machine hosting esd_internal and esd_external. For compose.yaml under esd_internal, change the IP to the machine hosting esd_external, vice versa
 2. Open `esd_external` folder in the terminal
 3. Run `docker compose up`
 4. Open `esd_internal` folder in the terminal
@@ -63,7 +63,7 @@
 ### Setting up Frontend
 
 1. Open terminal in vscode for Project folder
-2. Edit the project > src > service > constant.js file ip address under Microservice the ip address hosting the UI
+2. Edit the project > src > service > constant.js file ip address under Microservice to the machine running esd_external
 3. Run `npm install`
 4. Run `npm run dev` to run the vue
 5. copy paste the url from the terminal to the browser
